@@ -1,0 +1,298 @@
+// Bring in support styles
+@import "mixins";
+
+html,
+body {
+  width: 99%;
+  margin: 0;
+  padding: 0.5%;
+}
+
+.container-fluid {
+  width: 100%;
+  max-width: 1200px;
+  margin: 5px auto;
+}
+
+#map {
+  max-width: 710px;
+}
+
+section {
+  &.map {
+    width: 100%;
+    display: flex;
+    flex-flow: row wrap;
+  }
+
+  &.charts {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+  }
+}
+
+form {
+  &.side-nav {
+    width: 100%;
+    max-width: 250px;
+    min-width: 230px;
+    margin: 10px 0 10px auto;
+    border: 1px solid #ddd;
+    padding: 1em;
+    box-shadow: 0 0.3rem 0.7rem rgb(0 0 0 / 10%);
+  }
+
+  .form-group {
+    width: 100%;
+    margin: 5px 0;
+    padding: 5px;
+  }
+
+  select {
+    width: 96%;
+    // margin: 2%;
+    padding: 5px;
+  }
+}
+
+.charts {
+  &.county {
+    justify-content: flex-start;
+
+    .mini {
+      margin-right: 0.5em;
+    }
+  }
+}
+
+.chart-wrapper {
+  // width: 450px;
+  width: 46.8%;
+  height: 100%;
+  border: 1px solid #ddd;
+  padding: 1em;
+  box-shadow: 0 0.3rem 0.7rem rgb(0 0 0 / 10%);
+  margin-bottom: 10px;
+
+  &.mini {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    min-height: 200px;
+    max-width: 24%;
+  }
+
+  .chart {
+    padding: 10px;
+
+    h2 {
+      margin: 0 0 10px;
+    }
+
+    &.after-color {
+      position: relative;
+
+      &.yellow {
+        :before {
+          position: absolute;
+          top: 48px;
+          left: 0;
+          right: 0;
+          content: "";
+          display: block;
+          width: 100%;
+          max-width: 297px;
+          height: 160px;
+          margin: 0 auto;
+          padding: 70px 0;
+          margin: 0 auto;
+          border-radius: 300px;
+          background: yellow;
+        }
+      }
+
+      &.beige {
+        &:before {
+          position: absolute;
+          top: 48px;
+          left: 0;
+          right: 0;
+          content: "";
+          display: block;
+          width: 100%;
+          max-width: 297px;
+          height: 160px;
+          margin: 0 auto;
+          padding: 70px 0;
+          margin: 0 auto;
+          border-radius: 300px;
+          background: beige;
+        }
+      }
+
+      &.orange {
+        &:before {
+          position: absolute;
+          top: 48px;
+          left: 0;
+          right: 0;
+          content: "";
+          display: block;
+          width: 100%;
+          max-width: 297px;
+          height: 160px;
+          margin: 0 auto;
+          padding: 70px 0;
+          margin: 0 auto;
+          border-radius: 300px;
+          background: orange;
+        }
+      }
+
+      &.red {
+        &:before {
+          position: absolute;
+          top: 48px;
+          left: 0;
+          right: 0;
+          content: "";
+          display: block;
+          width: 100%;
+          max-width: 297px;
+          height: 160px;
+          margin: 0 auto;
+          padding: 70px 0;
+          margin: 0 auto;
+          border-radius: 300px;
+          background: red;
+        }
+      }
+
+      &.dark-red {
+        &:before {
+          position: absolute;
+          top: 48px;
+          left: 0;
+          right: 0;
+          content: "";
+          display: block;
+          width: 100%;
+          max-width: 297px;
+          height: 160px;
+          margin: 0 auto;
+          padding: 70px 0;
+          margin: 0 auto;
+          border-radius: 300px;
+          background: darkred;
+        }
+      }
+    }
+  }
+
+  .chart-container {
+    height: 300px;
+  }
+
+  .color-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 280px;
+    height: 160px;
+    padding: 70px 10px;
+    margin: 0 auto;
+    border-radius: 300px;
+    text-align: center;
+
+    .dsic-container {
+      background: #fff;
+      display: flex;
+      flex-flow: column;
+      justify-content: center;
+      border-radius: 300px;
+      width: 200px;
+      height: 200px;
+      margin-top: -19px;
+    }
+  }
+
+  &.yellow {
+    background: yellow;
+  }
+
+  &.beige {
+    background: beige;
+  }
+
+  &.orange {
+    background: orange;
+  }
+
+  &.red {
+    background: red;
+  }
+
+  &.dark-red {
+    background: darkred;
+  }
+}
+
+.table {
+  position: relative;
+  display: flex;
+  flex-flow: column;
+  height: 400px;
+  width: 100%;
+  min-width: 100%;
+  overflow: scroll;
+  border: 2px solid #39b613;
+
+  .table-wrapper {
+    position: absolute;
+    top: 0;
+  }
+
+  .row {
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+
+    &:nth-child(odd) {
+      background: #def1de;
+    }
+
+    &.header {
+      background-color: #39b511;
+      color: #fff;
+
+      .col {
+        border-top: none;
+
+        &:first-child {
+          border-left-color: #39b511;
+        }
+
+        &:last-child {
+          border-right-color: #39b511;
+        }
+      }
+    }
+
+    .col {
+      border: 1px solid #e8e8e8;
+      width: 150px;
+      min-width: 150px;
+      padding: 5px 3px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      cursor: pointer;
+    }
+  }
+}
+
+// Bring in support styles
+@import "utilities";
