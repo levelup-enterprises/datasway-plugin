@@ -4,22 +4,21 @@ const Loading = (params) => {
   const [loading, toggleLoading] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => {
-      toggleLoading(false);
-    }, [2000]);
-  });
+    typeof params.trigger !== "undefined"
+      ? params.trigger && toggleLoading(false)
+      : setTimeout(() => {
+          toggleLoading(false);
+        }, [2000]);
+  }, [params]);
 
   return (
     <>
-      {loading ? (
-        <div className="loading-spinner">
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-      ) : (
-        params.children
-      )}
+      <div className={loading ? "loading-spinner" : "hide"}>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+      <div className={loading ? "hide" : ""}>{params.children}</div>
     </>
   );
 };

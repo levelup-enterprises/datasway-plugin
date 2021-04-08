@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useContext } from "react";
 import { LocationContext } from "./context/location";
 import { getHay, getDrought, getHayTransactions } from "./services/get";
+import Loading from "./components/common/loading";
 import SideNav from "./components/forms/side-nav";
 import Region from "./views/region";
 import County from "./views/county";
@@ -11,8 +12,10 @@ require("./assets/maps/countymap.js");
 
 function App() {
   const { location, setLocation } = useContext(LocationContext);
+  const [mapLoaded, updateMapLoaded] = useState(false);
   // Map click states
   const [hayTrans, updateHayTrans] = useState(null);
+  const [droughtData, updateDroughtData] = useState(null);
 
   // Map globals
   const mapdata = window.simplemaps_countymap_mapdata.state_specific;
@@ -28,8 +31,8 @@ function App() {
   }, [location]);
 
   useEffect(() => {
+    updateMapLoaded(false);
     updateApp();
-    // getHayData();
     getDroughtData();
   }, [updateApp]);
 
@@ -59,14 +62,19 @@ function App() {
   };
 
   //? Get Drought for map
-  const getDroughtData = async (county) => {
-    const { success } = await getDrought({
-      map: true,
-    });
-    if (success) {
-      console.log("Drought:");
-      console.log(success);
-      updateHeatMap(success.data.map, "drought");
+  const getDroughtData = async () => {
+    if (!droughtData) {
+      const { success } = await getDrought({
+        map: true,
+      });
+      if (success) {
+        console.log("Drought:");
+        console.log(success);
+        updateHeatMap(success.data.map);
+        updateDroughtData(success.data.map);
+      }
+    } else {
+      map.refresh();
     }
   };
 
@@ -167,12 +175,10 @@ function App() {
   };
 
   //# Update heat map
-  const updateHeatMap = (data, type) => {
+  const updateHeatMap = (data) => {
     Object.values(data).forEach((v) => {
       if (typeof mapdata[v.fips] !== "undefined") {
-        type === "hay" && (mapdata[v.fips].color = hayColorChart(v.hay));
-        type === "drought" &&
-          (mapdata[v.fips].color = droughtColorChart(v.tier, v.influence));
+        mapdata[v.fips].color = droughtColorChart(v.tier, v.influence);
       }
     });
     map.refresh();
@@ -181,6 +187,7 @@ function App() {
   //# Map loaded
   map.hooks.complete = () => {
     console.log("Map has loaded");
+    updateMapLoaded(true);
   };
 
   //# Back button
@@ -188,17 +195,20 @@ function App() {
     county
       ? setLocation({ county: null })
       : region && setLocation({ region: null });
+    map.refresh();
   };
 
   //# Handle state clicks
   map.hooks.zoomable_click_region = (id) => {
     console.log(id);
+    id ? map.region_zoom(id) : map.back();
     setLocation({ region: id });
   };
 
   // //# Handle county clicks
   map.hooks.zoomable_click_state = (id) => {
     console.log(id);
+    map.state_zoom(id);
     setLocation({ county: id });
   };
 
@@ -206,7 +216,9 @@ function App() {
   return (
     <div className="container-fluid">
       <section className="map">
-        <div id="map"></div>
+        <Loading trigger={mapLoaded}>
+          <div id="map"></div>
+        </Loading>
         <SideNav
           regions={mapinfo.default_regions}
           counties={mapinfo.names}
@@ -218,7 +230,12 @@ function App() {
         <>
           <h1>Regional Section</h1>
           <section className="charts region">
-            <Region region={region} county={county} hayTrans={hayTrans} />
+            <Region
+              region={region}
+              county={county}
+              hayTrans={hayTrans}
+              refreshRegion={(id) => map.refresh_region(id)}
+            />
           </section>
 
           {county && (

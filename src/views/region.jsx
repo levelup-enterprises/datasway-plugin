@@ -11,7 +11,8 @@ import HayQuality from "../components/charts/hay-quality-pie";
 import HayClass from "../components/charts/hay-class-pie";
 import HayQualityBars from "../components/charts/hay-quality-bars";
 
-const Region = ({ region, hayTrans }) => {
+const Region = ({ region, hayTrans, refreshRegion }) => {
+  const [currentRegion, updateCurrentRegion] = useState(null);
   const [cattleData, updateCattleData] = useState(null);
   const [hayPrices, updateHayPrices] = useState([{}]);
 
@@ -27,25 +28,34 @@ const Region = ({ region, hayTrans }) => {
 
   //? Get cattle on feed data
   const getCattle = async (region) => {
-    const { success } = await getCattleFeed({
-      region: region,
-    });
-    if (success) {
-      console.log("Cattle on feed:");
-      console.log(success);
-      success.data && updateCattleData(success.data);
+    if (currentRegion !== region) {
+      const { success } = await getCattleFeed({
+        region: region,
+      });
+      if (success) {
+        console.log("Cattle on feed:");
+        console.log(success);
+        success.data && updateCattleData(success.data);
+        updateCurrentRegion(region);
+      }
+    } else {
+      refreshRegion(region);
     }
   };
 
   //? Get hay price data
   const getPrices = async (region) => {
-    const { success } = await getHayPrices({
-      region: region,
-    });
-    if (success) {
-      console.log("Hay Price:");
-      console.log(success);
-      success.data && updateHayPrices(success.data);
+    if (currentRegion !== region) {
+      const { success } = await getHayPrices({
+        region: region,
+      });
+      if (success) {
+        console.log("Hay Price:");
+        console.log(success);
+        success.data && updateHayPrices(success.data);
+      }
+    } else {
+      refreshRegion(region);
     }
   };
 
