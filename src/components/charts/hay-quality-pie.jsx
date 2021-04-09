@@ -80,31 +80,31 @@ const HayQuality = ({ data }) => {
               id: "lines",
             },
           ]}
-          legends={[
-            {
-              anchor: "right",
-              direction: "column",
-              justify: false,
-              translateX: 60,
-              translateY: 100,
-              itemsSpacing: 0,
-              itemWidth: 100,
-              itemHeight: 18,
-              itemTextColor: "#999",
-              itemDirection: "left-to-right",
-              itemOpacity: 1,
-              symbolSize: 15,
-              symbolShape: "circle",
-              effects: [
-                {
-                  on: "hover",
-                  style: {
-                    itemTextColor: "#000",
-                  },
-                },
-              ],
-            },
-          ]}
+          // legends={[
+          //   {
+          //     anchor: "right",
+          //     direction: "column",
+          //     justify: false,
+          //     translateX: 60,
+          //     translateY: 100,
+          //     itemsSpacing: 0,
+          //     itemWidth: 100,
+          //     itemHeight: 18,
+          //     itemTextColor: "#999",
+          //     itemDirection: "left-to-right",
+          //     itemOpacity: 1,
+          //     symbolSize: 15,
+          //     symbolShape: "circle",
+          //     effects: [
+          //       {
+          //         on: "hover",
+          //         style: {
+          //           itemTextColor: "#000",
+          //         },
+          //       },
+          //     ],
+          //   },
+          // ]}
         />
       )}
     </div>

@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useCallback, useContext } from "react";
 import { LocationContext } from "./context/location";
-import { getHay, getDrought, getHayTransactions } from "./services/get";
+import { getDrought, getHayTransactions } from "./services/get";
+// Components
 import Loading from "./components/common/loading";
 import SideNav from "./components/forms/side-nav";
 import Region from "./views/region";
 import County from "./views/county";
 
 // Pull map scripts
-require("./assets/maps/mapdata.min.js");
+require("./assets/maps/mapdata.js");
+require("./assets/maps/mapinfo.js");
 require("./assets/maps/countymap.js");
 
 function App() {
@@ -22,18 +24,16 @@ function App() {
   const mapinfo = window.simplemaps_countymap_mapinfo;
   const map = window.simplemaps_countymap;
 
-  //* Get all hay data
-
   //# Get region data on state change
   const updateApp = useCallback(() => {
     console.log(location);
     getHayTable(location.region);
+    getDroughtData();
   }, [location]);
 
   useEffect(() => {
     updateMapLoaded(false);
     updateApp();
-    getDroughtData();
   }, [updateApp]);
 
   //? Get hay transaction data
@@ -46,17 +46,6 @@ function App() {
       console.log(success);
       success.data && updateHayTrans(success.data);
       updateHeatMap(success.data);
-    }
-    error && console.log(error);
-  };
-
-  //? Get hay data
-  const getHayData = async () => {
-    const { success, error } = await getHay({ map: true });
-    if (success) {
-      console.log("Hay:");
-      console.log(success);
-      updateHeatMap(success.data, "hay");
     }
     error && console.log(error);
   };
@@ -75,33 +64,6 @@ function App() {
       }
     } else {
       map.refresh();
-    }
-  };
-
-  //? Hay colors for map
-  const hayColorChart = (v) => {
-    if (v < 100) {
-      return "#a9daa4";
-    } else if (v < 200) {
-      return "#7fc778";
-    } else if (v < 300) {
-      return "#66ad5f";
-    } else if (v < 400) {
-      return "#559a4f";
-    } else if (v < 500) {
-      return "#458240";
-    } else if (v < 600) {
-      return "#31732b";
-    } else if (v < 700) {
-      return "#2a6d24";
-    } else if (v < 800) {
-      return "#1f5a19";
-    } else if (v < 900) {
-      return "#154e10";
-    } else if (v < 1000) {
-      return "#0b4606";
-    } else {
-      return "#0b4606";
     }
   };
 
@@ -187,7 +149,6 @@ function App() {
   //# Map loaded
   map.hooks.complete = () => {
     console.log("Map has loaded");
-    updateMapLoaded(true);
   };
 
   //# Back button
@@ -195,7 +156,12 @@ function App() {
     county
       ? setLocation({ county: null })
       : region && setLocation({ region: null });
-    map.refresh();
+    map && map.refresh();
+  };
+
+  map.hooks.zooming_complete = () => {
+    console.log("Zooming complete!");
+    updateMapLoaded(true);
   };
 
   //# Handle state clicks
@@ -226,9 +192,17 @@ function App() {
           updateCounty={map.hooks.zoomable_click_state}
         />
       </section>
+      {county && (
+        <>
+          <h1>County information</h1>
+          <section className="charts">
+            <County region={region} county={county} hayTrans={hayTrans} />
+          </section>
+        </>
+      )}
       {region && (
         <>
-          <h1>Regional Section</h1>
+          <h1>Regional information</h1>
           <section className="charts region">
             <Region
               region={region}
@@ -237,15 +211,6 @@ function App() {
               refreshRegion={(id) => map.refresh_region(id)}
             />
           </section>
-
-          {county && (
-            <>
-              <h1>County Section</h1>
-              <section className="charts">
-                <County region={region} county={county} hayTrans={hayTrans} />
-              </section>
-            </>
-          )}
         </>
       )}
     </div>

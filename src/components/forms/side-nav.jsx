@@ -9,8 +9,10 @@ const SideNav = ({ regions, counties, updateRegion, updateCounty }) => {
   let states = [];
 
   // Sort states
-  states = Object.entries(regions).map((v) => [v[0], v[1].name]);
-  sortValues(states);
+  if (regions) {
+    states = Object.entries(regions).map((v) => [v[0], v[1].name]);
+    sortValues(states);
+  }
 
   const handleRegion = (e) => {
     e.preventDefault();
