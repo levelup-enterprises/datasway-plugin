@@ -90,7 +90,6 @@ export async function getJwt(clear = null) {
   try {
     let token = session.get(tokenKey) || null;
     if (!token || clear) {
-      // const { data } = await http.get("get/token.php");
       const { data } = await http.post(
         "post/authenticate.php",
         postify({

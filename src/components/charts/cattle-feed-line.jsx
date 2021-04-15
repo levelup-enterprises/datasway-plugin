@@ -1,26 +1,35 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ResponsiveLine } from "@nivo/line";
-import _ from "lodash";
+import _, { values } from "lodash";
 
 const CattleFeedLine = ({ data }) => {
+  const [values, updateValues] = useState({});
+
   // Build data object
-  if (!_.isEmpty(data)) {
-    var values = [];
-    Object.entries(data).forEach((c) => {
-      if (c[0] !== "config" && c[0] !== "count") {
-        values[c[0]] = Object.entries(c[1]).map((v) => {
-          return { id: v[0], data: v[1] };
-        });
-      }
-    });
-  }
+  const updateData = (data) => {
+    if (!_.isEmpty(data)) {
+      let values = [];
+      Object.entries(data).forEach((c) => {
+        if (c[0] !== "config" && c[0] !== "count") {
+          values[c[0]] = Object.entries(c[1]).map((v) => {
+            return { id: v[0], data: v[1] };
+          });
+        }
+      });
+      return values.data;
+    }
+  };
+
+  useEffect(() => {
+    updateValues(updateData(data));
+  }, [data]);
 
   //# USE hay-price table
   return (
     <div className="chart-container wide">
       {values && (
         <ResponsiveLine
-          data={values.data}
+          data={values}
           margin={{ top: 50, right: 120, bottom: 50, left: 60 }}
           colors={data.config ? data.config : null}
           xScale={{

@@ -1,6 +1,5 @@
 import React from "react";
 import { ResponsivePie } from "@nivo/pie";
-import _ from "lodash";
 
 const HayQuality = ({ data }) => {
   if (data) {

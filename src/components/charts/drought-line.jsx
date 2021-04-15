@@ -1,21 +1,29 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { linearGradientDef } from "@nivo/core";
 import { ResponsiveLine } from "@nivo/line";
 
 const DroughtLine = ({ data }) => {
+  const [values, updateValues] = useState({});
   // Build data object
-  if (data) {
-    var droughtData = [];
-    droughtData = data.map((v) => ({ x: v.x, y: parseInt(v.y) }));
-    data = [{ id: "Drought", data: droughtData }];
-  }
+  const updateData = (data) => {
+    if (data) {
+      var droughtData = [];
+      droughtData = data.map((v) => ({ x: v.x, y: parseInt(v.y) }));
+      data = [{ id: "Drought", data: droughtData }];
+      return data;
+    }
+  };
+
+  useEffect(() => {
+    updateValues(updateData(data));
+  }, [data]);
 
   //# USE hay-price table
   return (
     <div className="chart-container">
-      {data[0].id && (
+      {values && (
         <ResponsiveLine
-          data={data}
+          data={values}
           margin={{ top: 50, right: 20, bottom: 50, left: 60 }}
           colors={["transparent"]}
           xScale={{

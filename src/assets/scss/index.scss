@@ -16,6 +16,7 @@ body {
 
 #map {
   max-width: 710px;
+  transition: 0.3s ease-in-out;
 }
 
 section {
@@ -23,9 +24,24 @@ section {
     width: 100%;
     display: flex;
     flex-flow: row wrap;
+
+    .loading-wrapper {
+      width: 700px;
+      height: 410px;
+    }
+
+    .loading-spinner {
+      margin-top: 124px;
+    }
   }
 
   &.charts {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+  }
+
+  &.ads {
     display: flex;
     flex-flow: row wrap;
     justify-content: space-between;
@@ -34,6 +50,7 @@ section {
 
 form {
   &.side-nav {
+    position: relative;
     width: 100%;
     max-width: 250px;
     min-width: 230px;
@@ -53,6 +70,14 @@ form {
     width: 96%;
     // margin: 2%;
     padding: 5px;
+  }
+
+  button {
+    position: absolute;
+    width: 90%;
+    bottom: 10px;
+    padding: 5px 20px;
+    left: 5%;
   }
 }
 
@@ -294,5 +319,21 @@ form {
   }
 }
 
+.card {
+  width: 100%;
+  max-width: 250px;
+  margin: 10px;
+  border: 1px solid #ddd;
+  padding: 0 1em 1em;
+  box-shadow: 0 0.3rem 0.7rem rgb(0 0 0 / 10%);
+
+  img {
+    width: 100%;
+  }
+}
+
 // Bring in support styles
 @import "utilities";
+
+// Bring in responsive styles
+@import "responsive";

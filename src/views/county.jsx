@@ -7,16 +7,21 @@ import DroughtLine from "../components/charts/drought-line";
 import Cropland from "../components/charts/cropland-pie";
 import DroughtDSIC from "../components/charts/drought-pie";
 
-const County = ({ county }) => {
+const County = ({ county, refreshMap }) => {
   // States
+  const [currentCounty, updateCurrentCounty] = useState(null);
   const [droughtData, updateDroughtData] = useState(null);
   const [droughtDSIC, updateDroughtDSIC] = useState(null);
   const [hayProd, updateHayProd] = useState(null);
+  const [loaded, toggleLoaded] = useState(false);
 
   //# Get region data on state change
   const updateRegion = useCallback(() => {
-    getDroughtData(county);
-    getHayData(county);
+    if (currentCounty !== county) {
+      toggleLoaded(false);
+      getDroughtData(county);
+      getHayData(county);
+    } else refreshMap();
   }, [county]);
 
   useEffect(() => {
@@ -33,6 +38,7 @@ const County = ({ county }) => {
       console.log(success);
       success.data && updateDroughtData(success.data.graph);
       success.data && updateDroughtDSIC(success.data.current);
+      updateCurrentCounty(county);
     }
   };
 
@@ -47,46 +53,42 @@ const County = ({ county }) => {
       const { data } = success;
       console.log(data);
       updateHayProd(data);
-      // updateHayPercent(data.hay_percent);
-      // updateCropPercent(data.crop_percent);
     }
+    toggleLoaded(true);
   };
 
   return (
-    <>
-      {!_.isEmpty(droughtData) && (
-        <div className="chart-wrapper w-100">
-          <div className="chart">
-            <h2>Extreme Drought</h2>
-            <Loading>
+    <Loading trigger={loaded} message="Gathering county data">
+      <h1 className="mt-2">County information</h1>
+      <section className="charts">
+        {!_.isEmpty(droughtData) && (
+          <div className="chart-wrapper w-100">
+            <div className="chart">
+              <h2>Extreme Drought</h2>
               <DroughtLine data={droughtData} />
-            </Loading>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {!_.isEmpty(droughtDSIC) && (
-        <div className="chart-wrapper w-50">
-          <div className="chart">
-            <h2>DSIC</h2>
-            <Loading>
+        {!_.isEmpty(droughtDSIC) && (
+          <div className="chart-wrapper w-50">
+            <div className="chart">
+              <h2>DSIC</h2>
               <DroughtDSIC data={droughtDSIC} />
-            </Loading>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {!_.isEmpty(hayProd) && (
-        <div className="chart-wrapper w-50">
-          <div className="chart">
-            <h2>Cropland</h2>
-            <Loading>
+        {!_.isEmpty(hayProd) && (
+          <div className="chart-wrapper w-50">
+            <div className="chart">
+              <h2>Cropland</h2>
               <Cropland data={hayProd} />
-            </Loading>
+            </div>
           </div>
-        </div>
-      )}
-    </>
+        )}
+      </section>
+    </Loading>
   );
 };
 

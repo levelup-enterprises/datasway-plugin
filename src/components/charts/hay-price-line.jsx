@@ -1,6 +1,5 @@
 import React from "react";
 import { ResponsiveLine } from "@nivo/line";
-import _ from "lodash";
 
 const HayPriceLine = ({ data }) => {
   // Build data object

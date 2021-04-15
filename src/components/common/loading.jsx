@@ -13,12 +13,19 @@ const Loading = (params) => {
 
   return (
     <>
-      <div className={loading ? "loading-spinner" : "hide"}>
-        <div></div>
-        <div></div>
-        <div></div>
+      <div className={loading ? "loading-wrapper" : "hide"}>
+        <div className="loading-spinner">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        {params.message && loading && (
+          <div className="loading-message fade-in-out">{params.message}</div>
+        )}
       </div>
-      <div className={loading ? "hide" : ""}>{params.children}</div>
+      <div className={loading ? "hide" : "loading-content"}>
+        {params.children}
+      </div>
     </>
   );
 };

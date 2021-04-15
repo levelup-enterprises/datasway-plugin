@@ -1,56 +1,48 @@
 import React, { useState, useEffect, useCallback, useContext } from "react";
 import { LocationContext } from "./context/location";
-import { getDrought, getHayTransactions } from "./services/get";
+import { getDrought, getAds } from "./services/get";
+import zipCodes from "./assets/data/zipcodes.json";
 // Components
 import Loading from "./components/common/loading";
 import SideNav from "./components/forms/side-nav";
+import Ads from "./views/ads";
 import Region from "./views/region";
 import County from "./views/county";
 
 // Pull map scripts
-require("./assets/maps/mapdata.js");
-require("./assets/maps/mapinfo.js");
+require("./assets/maps/mapdata.min.js");
+require("./assets/maps/mapinfo.min.js");
 require("./assets/maps/countymap.js");
 
 function App() {
+  // Context
   const { location, setLocation } = useContext(LocationContext);
+  // States
   const [mapLoaded, updateMapLoaded] = useState(false);
-  // Map click states
-  const [hayTrans, updateHayTrans] = useState(null);
+  const [heatMapLoaded, setHeatMapLoaded] = useState(false);
+  const [adsLoaded, setAdsLoaded] = useState(false);
+  const [adData, updateAdData] = useState(null);
   const [droughtData, updateDroughtData] = useState(null);
+  const [viewAds, toggleViewAds] = useState(false);
 
   // Map globals
-  const mapdata = window.simplemaps_countymap_mapdata.state_specific;
+  const mapdata = window.simplemaps_countymap_mapdata;
+  const mapdataStates = window.simplemaps_countymap_mapdata.state_specific;
   const mapinfo = window.simplemaps_countymap_mapinfo;
   const map = window.simplemaps_countymap;
 
   //# Get region data on state change
   const updateApp = useCallback(() => {
     console.log(location);
-    getHayTable(location.region);
+    getAdData();
     getDroughtData();
   }, [location]);
 
   useEffect(() => {
-    updateMapLoaded(false);
-    updateApp();
-  }, [updateApp]);
+    !mapLoaded && map.load();
+  }, [mapLoaded, map]);
 
-  //? Get hay transaction data
-  const getHayTable = async (region) => {
-    const { success, error } = await getHayTransactions({
-      region: region,
-    });
-    if (success) {
-      console.log("Hay Transactions:");
-      console.log(success);
-      success.data && updateHayTrans(success.data);
-      updateHeatMap(success.data);
-    }
-    error && console.log(error);
-  };
-
-  //? Get Drought for map
+  //* Get Drought for map
   const getDroughtData = async () => {
     if (!droughtData) {
       const { success } = await getDrought({
@@ -67,7 +59,27 @@ function App() {
     }
   };
 
-  //? Drought colors for map
+  //* Get Allhay.com ad data
+  const getAdData = async (params) => {
+    try {
+      if (!adData) {
+        const { data } = await getAds();
+        if (data) {
+          console.log("Ads:");
+          console.log(data);
+          if (data.entries) {
+            updateLocations(data.entries);
+          }
+        }
+      } else {
+        map.refresh();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  //* Drought colors for map
   const droughtColorChart = (t, i) => {
     if (t === 1) {
       if (i > 100 && i < 300) {
@@ -136,19 +148,60 @@ function App() {
     }
   };
 
+  //# Update Ad Locations
+  const updateLocations = (zips) => {
+    if (adsLoaded) {
+      map.refresh();
+    } else {
+      try {
+        let locations = {};
+        Object.values(zips).forEach((v) => {
+          const img = v[24].length > 0 ? v[24].replace("|:||:||:|", "") : "";
+
+          v[39] !== "" &&
+            zipCodes[v[39]] &&
+            (locations[v.post_id] = {
+              name: v[4],
+              state: v[3],
+              type: v[42],
+              description: v[8],
+              url: process.env.REACT_APP_ALLHAY_POSTS + v.post_id,
+              img_url: img,
+              ...zipCodes[v[39]],
+            });
+        });
+        console.log("Locations:");
+        console.log(locations);
+        mapdata.locations = locations;
+        map.refresh();
+        updateAdData(locations);
+        setAdsLoaded(true);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  };
+
   //# Update heat map
   const updateHeatMap = (data) => {
-    Object.values(data).forEach((v) => {
-      if (typeof mapdata[v.fips] !== "undefined") {
-        mapdata[v.fips].color = droughtColorChart(v.tier, v.influence);
-      }
-    });
-    map.refresh();
+    if (heatMapLoaded) {
+      map.refresh();
+    } else {
+      Object.values(data).forEach((v) => {
+        if (typeof mapdataStates[v.fips] !== "undefined") {
+          mapdataStates[v.fips].color = droughtColorChart(v.tier, v.influence);
+        }
+      });
+      map.refresh();
+      setHeatMapLoaded(true);
+      updateMapLoaded(true);
+    }
   };
 
   //# Map loaded
   map.hooks.complete = () => {
     console.log("Map has loaded");
+    updateApp();
   };
 
   //# Back button
@@ -156,12 +209,12 @@ function App() {
     county
       ? setLocation({ county: null })
       : region && setLocation({ region: null });
-    map && map.refresh();
   };
 
+  //# Refresh on load complete
   map.hooks.zooming_complete = () => {
     console.log("Zooming complete!");
-    updateMapLoaded(true);
+    map.refresh();
   };
 
   //# Handle state clicks
@@ -174,15 +227,17 @@ function App() {
   // //# Handle county clicks
   map.hooks.zoomable_click_state = (id) => {
     console.log(id);
-    map.state_zoom(id);
+    id ? map.state_zoom(id) : map.back();
     setLocation({ county: id });
   };
+
+  console.log(mapdata.main_settings);
 
   const { region, county } = location;
   return (
     <div className="container-fluid">
       <section className="map">
-        <Loading trigger={mapLoaded}>
+        <Loading trigger={mapLoaded} message="Building map">
           <div id="map"></div>
         </Loading>
         <SideNav
@@ -190,28 +245,18 @@ function App() {
           counties={mapinfo.names}
           updateRegion={map.hooks.zoomable_click_region}
           updateCounty={map.hooks.zoomable_click_state}
+          ads={adData}
+          showAds={() => toggleViewAds(!viewAds)}
         />
       </section>
-      {county && (
-        <>
-          <h1>County information</h1>
-          <section className="charts">
-            <County region={region} county={county} hayTrans={hayTrans} />
-          </section>
-        </>
-      )}
+      {adData && viewAds && <Ads data={adData} />}
+      {county && <County county={county} refreshMap={() => map.refresh()} />}
       {region && (
-        <>
-          <h1>Regional information</h1>
-          <section className="charts region">
-            <Region
-              region={region}
-              county={county}
-              hayTrans={hayTrans}
-              refreshRegion={(id) => map.refresh_region(id)}
-            />
-          </section>
-        </>
+        <Region
+          region={region}
+          county={county}
+          refreshMap={() => map.refresh()}
+        />
       )}
     </div>
   );

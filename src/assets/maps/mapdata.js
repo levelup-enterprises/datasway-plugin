@@ -18,7 +18,7 @@ window.simplemaps_countymap_mapdata = {
 
     //Location defaults
     location_description: "Location description",
-    location_color: "#FF0067",
+    location_color: "green",
     location_opacity: 0.8,
     location_hover_opacity: 1,
     location_url: "",
@@ -50,7 +50,7 @@ window.simplemaps_countymap_mapdata = {
     region_hover_opacity: 0.6,
     zoom_out_incrementally: "yes",
     zoom_percentage: 0.99,
-    zoom_time: 0.5,
+    zoom_time: 0.3,
 
     //Popup settings
     popup_color: "white",
@@ -62,7 +62,7 @@ window.simplemaps_countymap_mapdata = {
 
     //Advanced settings
     div: "map",
-    auto_load: "yes",
+    auto_load: "no",
     rotate: "0",
     url_new_tab: "no",
     images_directory: "default",
@@ -12649,13 +12649,7 @@ window.simplemaps_countymap_mapdata = {
       description: " ",
     },
   },
-  locations: {
-    0: {
-      name: "New York",
-      lat: "40.71",
-      lng: "-74.0059731",
-    },
-  },
+  locations: {},
   labels: {},
   lines: {
     0: {

@@ -1,10 +1,19 @@
 import React, { useState, useContext, useEffect, useCallback } from "react";
 import { LocationContext } from "../../context/location";
 import { sortValues } from "../../services/utilities";
+import _ from "lodash";
 
-const SideNav = ({ regions, counties, updateRegion, updateCounty }) => {
+const SideNav = ({
+  regions,
+  counties,
+  updateRegion,
+  updateCounty,
+  ads,
+  showAds,
+}) => {
   const { location, setLocation } = useContext(LocationContext);
   const [countyArray, updateCountyArray] = useState(null);
+  const [showAd, toggleShowAd] = useState(false);
 
   let states = [];
 
@@ -34,22 +43,31 @@ const SideNav = ({ regions, counties, updateRegion, updateCounty }) => {
     updateCounty(county);
   };
 
-  const countyDropdown = useCallback((state) => {
-    const array = [];
+  const countyDropdown = useCallback(
+    (state) => {
+      const array = [];
 
-    regions[state].states.forEach((f) => {
-      array.push(Object.entries(counties).filter((v) => v[0] === f));
-    });
+      regions[state].states.forEach((f) => {
+        array.push(Object.entries(counties).filter((v) => v[0] === f));
+      });
 
-    // Sort counties
-    sortValues(array);
+      // Sort counties
+      sortValues(array);
 
-    updateCountyArray(array);
-  }, []);
+      updateCountyArray(array);
+    },
+    [counties, regions]
+  );
 
   useEffect(() => {
     location.region && countyDropdown(location.region);
   }, [location, countyDropdown]);
+
+  const handleShowAds = (e) => {
+    e.preventDefault();
+    showAds();
+    toggleShowAd(!showAd);
+  };
 
   return (
     <form className="side-nav">
@@ -92,6 +110,11 @@ const SideNav = ({ regions, counties, updateRegion, updateCounty }) => {
               ))}
           </select>
         </div>
+      )}
+      {ads && !_.isEmpty(ads) && (
+        <button onClick={(e) => handleShowAds(e)}>
+          {showAd ? "Hide ads" : "Display ads"}
+        </button>
       )}
     </form>
   );

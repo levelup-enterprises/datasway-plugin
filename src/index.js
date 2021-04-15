@@ -5,13 +5,16 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { LocationProvider } from "./context/location";
 
+const id =
+  process.env.NODE_ENV === "development" ? "root" : "dataswayDashboard";
+
 ReactDOM.render(
   <React.StrictMode>
     <LocationProvider>
       <App />
     </LocationProvider>
   </React.StrictMode>,
-  document.getElementById("root")
+  document.getElementById(id)
 );
 
 // If you want to start measuring performance in your app, pass a function

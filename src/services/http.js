@@ -33,8 +33,9 @@ axios.interceptors.response.use(null, (errors) => {
 // Set X Auth in outbound headers
 const setJwt = (jwt) => {
   axios.defaults.headers.common["X-Auth-Token"] = jwt;
-  // axios.defaults.headers.Authorization = `Bearer ${jwt}`;
 };
+
+!axios.defaults.headers.common["X-Auth-Token"] && setJwt(session.get("token"));
 
 export default {
   get: axios.get,
