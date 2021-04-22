@@ -31,11 +31,24 @@
 .mt-2 {
   margin-top: 2em;
 }
+.mt-5 {
+  margin-top: 5em;
+}
 
 .hide {
   display: none;
   transition: 0.3s ease-in-out;
 }
+
+.muted {
+  opacity: 0.7;
+}
+
+.info {
+  color: $green;
+  font-weight: bold;
+}
+
 .loading-wrapper {
   .loading-spinner {
     display: block;

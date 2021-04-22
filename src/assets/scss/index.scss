@@ -58,26 +58,52 @@ form {
     border: 1px solid #ddd;
     padding: 1em;
     box-shadow: 0 0.3rem 0.7rem rgb(0 0 0 / 10%);
+
+    button {
+      position: absolute;
+      width: 90%;
+      bottom: 10px;
+      padding: 5px 20px;
+      left: 5%;
+    }
+  }
+
+  &.filter-wrapper {
+    display: flex;
+    flex-flow: row wrap;
+    // justify-content: flex-end;
+    width: 100%;
   }
 
   .form-group {
     width: 100%;
     margin: 5px 0;
     padding: 5px;
+
+    &.select {
+      width: auto;
+
+      h4 {
+        margin: 0 0 5px 5px;
+      }
+    }
+
+    &.reset {
+      margin-top: 30px;
+      width: auto;
+    }
+
+    .input-select {
+      width: fit-content;
+      margin-left: 5px;
+      padding-right: 32px !important;
+    }
   }
 
   select {
     width: 96%;
     // margin: 2%;
     padding: 5px;
-  }
-
-  button {
-    position: absolute;
-    width: 90%;
-    bottom: 10px;
-    padding: 5px 20px;
-    left: 5%;
   }
 }
 
@@ -114,6 +140,11 @@ form {
 
     h2 {
       margin: 0 0 10px;
+    }
+
+    .chart-dropdown {
+      display: block;
+      margin-left: auto;
     }
 
     &.after-color {
@@ -269,6 +300,7 @@ form {
   position: relative;
   display: flex;
   flex-flow: column;
+  justify-content: center;
   height: 400px;
   width: 100%;
   min-width: 100%;
@@ -278,6 +310,11 @@ form {
   .table-wrapper {
     position: absolute;
     top: 0;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 3em;
   }
 
   .row {
@@ -317,6 +354,37 @@ form {
       cursor: pointer;
     }
   }
+
+  .col {
+    &.asc {
+      position: relative;
+      &:after {
+        content: "";
+        position: absolute;
+        top: 11px;
+        width: 0;
+        margin-left: 5px;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-bottom: 5px solid #fff;
+      }
+    }
+    &.desc {
+      position: relative;
+      &:after {
+        content: "";
+        position: absolute;
+        top: 11px;
+        width: 0;
+        margin-left: 5px;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid #fff;
+      }
+    }
+  }
 }
 
 .card {
@@ -327,13 +395,31 @@ form {
   padding: 0 1em 1em;
   box-shadow: 0 0.3rem 0.7rem rgb(0 0 0 / 10%);
 
+  h4 {
+    margin: 1em 0;
+  }
+
   img {
     width: 100%;
   }
 }
 
+.disclaimer {
+  margin-top: 5em;
+  background: #f8f6f1;
+  padding: 10px 15px;
+  border-radius: 10px;
+
+  h4 {
+    margin: 1.5em 0;
+  }
+}
+
 // Bring in support styles
 @import "utilities";
+
+// Bring in wp app overrides
+@import "overrides";
 
 // Bring in responsive styles
 @import "responsive";

@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ResponsivePie } from "@nivo/pie";
 
-const DroughtDSIC = ({ data }) => {
+const DroughtDSIC = ({ data, dimensions }) => {
+  const [configBottom, setConfigBottom] = useState("20px");
   var tier = "";
   var color = "";
 
@@ -46,6 +47,14 @@ const DroughtDSIC = ({ data }) => {
     }
   }
 
+  useEffect(() => {
+    if (dimensions && dimensions.width < 400) {
+      setConfigBottom("4vw");
+    } else {
+      setConfigBottom("20px");
+    }
+  }, [dimensions]);
+
   const CenteredMetric = ({ dataWithArc, centerX, centerY }) => {
     return (
       <>
@@ -67,7 +76,7 @@ const DroughtDSIC = ({ data }) => {
           textAnchor="middle"
           dominantBaseline="central"
           style={{
-            fontSize: "20px",
+            fontSize: configBottom,
             fontWeight: "600",
           }}
         >
@@ -81,6 +90,7 @@ const DroughtDSIC = ({ data }) => {
     <div className="chart-container">
       {values && (
         <ResponsivePie
+          key={dimensions && dimensions.width}
           data={values}
           margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
           sortByValue={true}
@@ -89,7 +99,7 @@ const DroughtDSIC = ({ data }) => {
           cornerRadius={0}
           valueFormat={(v) => `${v}%`}
           colors={color}
-          borderWidth={1}
+          borderWidth={0}
           borderColor={{ from: "color" }}
           enableSliceLabels={false}
           enableRadialLabels={false}

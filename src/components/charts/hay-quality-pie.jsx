@@ -1,7 +1,15 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ResponsivePie } from "@nivo/pie";
 
-const HayQuality = ({ data }) => {
+const HayQuality = ({ data, dimensions }) => {
+  const [showLabels, toggleShowLables] = useState(true);
+  const [margins, setMargins] = useState({
+    top: 20,
+    right: 80,
+    bottom: 60,
+    left: 80,
+  });
+
   if (data) {
     var quality = {};
     var total = data.length;
@@ -18,12 +26,33 @@ const HayQuality = ({ data }) => {
     }));
   }
 
+  useEffect(() => {
+    if (dimensions && dimensions.width < 450) {
+      toggleShowLables(false);
+      setMargins({
+        top: 20,
+        right: 20,
+        bottom: 20,
+        left: 20,
+      });
+    } else {
+      toggleShowLables(true);
+      setMargins({
+        top: 20,
+        right: 80,
+        bottom: 60,
+        left: 80,
+      });
+    }
+  }, [dimensions]);
+
   return (
     <div className="chart-container">
       {values && (
         <ResponsivePie
+          key={dimensions && dimensions.width}
           data={values}
-          margin={{ top: 20, right: 80, bottom: 60, left: 80 }}
+          margin={margins}
           startAngle={-60}
           sortByValue={true}
           innerRadius={0}
@@ -44,6 +73,7 @@ const HayQuality = ({ data }) => {
           sliceLabelsSkipAngle={10}
           sliceLabelsTextColor="#333333"
           enableSliceLabels={false}
+          enableRadialLabels={showLabels}
           radialLabel={(d) => `${d.id} (${d.formattedValue})`}
           defs={[
             {

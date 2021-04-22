@@ -1,0 +1,25 @@
+.footer-nav {
+  width: 100%;
+  overflow: auto;
+}
+
+input[type="date"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  display: block;
+  background: #f8f6f2;
+  border: 1px solid #ebe8e2;
+  border-radius: 0;
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 8px 6px !important;
+  color: #9c9288;
+  line-height: 1.25 !important;
+  font-size: 1em !important;
+}
+
+@media all and (max-width: 600px) {
+  #content.site-content {
+    padding: 0 5px;
+  }
+}

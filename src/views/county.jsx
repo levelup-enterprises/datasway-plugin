@@ -7,7 +7,7 @@ import DroughtLine from "../components/charts/drought-line";
 import Cropland from "../components/charts/cropland-pie";
 import DroughtDSIC from "../components/charts/drought-pie";
 
-const County = ({ county, refreshMap }) => {
+const County = ({ county, refreshMap, dimensions }) => {
   // States
   const [currentCounty, updateCurrentCounty] = useState(null);
   const [droughtData, updateDroughtData] = useState(null);
@@ -64,8 +64,8 @@ const County = ({ county, refreshMap }) => {
         {!_.isEmpty(droughtData) && (
           <div className="chart-wrapper w-100">
             <div className="chart">
-              <h2>Extreme Drought</h2>
-              <DroughtLine data={droughtData} />
+              <h2>Historical Drought</h2>
+              <DroughtLine data={droughtData} dimensions={dimensions} />
             </div>
           </div>
         )}
@@ -73,8 +73,12 @@ const County = ({ county, refreshMap }) => {
         {!_.isEmpty(droughtDSIC) && (
           <div className="chart-wrapper w-50">
             <div className="chart">
-              <h2>DSIC</h2>
-              <DroughtDSIC data={droughtDSIC} />
+              <h2>DSCI</h2>
+              <p className="muted">
+                The Drought Severity and Coverage Index represents drought
+                levels for the county.
+              </p>
+              <DroughtDSIC data={droughtDSIC} dimensions={dimensions} />
             </div>
           </div>
         )}
@@ -83,7 +87,12 @@ const County = ({ county, refreshMap }) => {
           <div className="chart-wrapper w-50">
             <div className="chart">
               <h2>Cropland</h2>
-              <Cropland data={hayProd} />
+              <p className="muted">
+                Illustrates the percentage of cropland that is hay in the
+                county. The hay production value is total yearly production of
+                hay in tons.
+              </p>
+              <Cropland data={hayProd} dimensions={dimensions} />
             </div>
           </div>
         )}

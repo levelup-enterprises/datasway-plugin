@@ -254,11 +254,30 @@ export function searchFilter(array, search) {
             typeof value !== "number"
               ? (value = value.toLowerCase())
               : (value = value.toString());
-            searched.push(value.includes(search.toLowerCase()));
+            // searched.push(value.includes(search.toLowerCase()));
+            searched.push(value === search.toLowerCase());
           } else searched.push(false);
         });
         return searched.find((v) => v === true) && obj;
       } else return obj;
     });
   } else return [];
+}
+
+/** ------------------------------------
+ ** Prevent too many resize calls
+ * ------------------------------------
+ * @param {object} array
+ * @param {string} search
+ * @return object
+ */
+export function debounce(fn, ms) {
+  let timer;
+  return (_) => {
+    clearTimeout(timer);
+    timer = setTimeout((_) => {
+      timer = null;
+      fn.apply(this, arguments);
+    }, ms);
+  };
 }

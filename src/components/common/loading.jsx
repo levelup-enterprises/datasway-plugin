@@ -5,7 +5,9 @@ const Loading = (params) => {
 
   useEffect(() => {
     typeof params.trigger !== "undefined"
-      ? params.trigger && toggleLoading(false)
+      ? params.trigger
+        ? toggleLoading(false)
+        : toggleLoading(true)
       : setTimeout(() => {
           toggleLoading(false);
         }, [2000]);

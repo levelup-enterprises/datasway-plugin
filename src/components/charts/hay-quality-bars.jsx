@@ -1,35 +1,61 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ResponsiveBar } from "@nivo/bar";
 import _ from "lodash";
 
-const HayQualityBars = ({ data }) => {
+const HayQualityBars = ({ data, dimensions }) => {
+  const [quality, setQuality] = useState({});
+  const [config, setConfig] = useState({
+    margin: 50,
+    rotate: 0,
+    offset: 32,
+  });
   // Build data object
-  if (!_.isEmpty(data)) {
-    var quality = [];
-    // var colors = [];
-    quality.push(
-      Object.entries(data).map((c) => ({ quality: c[0], "Min Price": c[1] }))
-    );
-    quality = quality[0];
-    console.log(quality);
-  }
+  const updateData = (data) => {
+    if (!_.isEmpty(data)) {
+      let quality = [];
+      quality.push(
+        Object.entries(data).map((c) => ({ quality: c[0], "Min Price": c[1] }))
+      );
+      return quality[0];
+    } else return {};
+  };
+
+  // Modify based on screen width
+  const modifyChart = (screen) => {
+    screen.width < 750
+      ? setConfig({
+          margin: 60,
+          rotate: -60,
+          offset: 40,
+        })
+      : setConfig({
+          margin: 50,
+          rotate: 0,
+          offset: 32,
+        });
+  };
+
+  useEffect(() => {
+    dimensions && modifyChart(dimensions);
+    setQuality(updateData(data));
+  }, [data]);
 
   //# USE hay-price table
   return (
     <div className="chart-container wide">
       {quality && (
         <ResponsiveBar
+          key={quality[0] && quality[0]["Min Price"] + dimensions.width}
           data={quality}
           keys={["Min Price"]}
           indexBy="quality"
           colors={{ scheme: "greens" }}
           colorBy="indexValue"
-          margin={{ top: 20, right: 20, bottom: 50, left: 120 }}
+          margin={{ top: 20, right: 20, bottom: config.margin, left: 120 }}
           padding={0.15}
           layout="horizontal"
           valueScale={{ type: "linear" }}
           indexScale={{ type: "band", round: true }}
-          // colors={{ scheme: "nivo" }}
           defs={[
             {
               id: "dots",
@@ -53,14 +79,18 @@ const HayQualityBars = ({ data }) => {
           borderColor={{ from: "color", modifiers: [["darker", 1.6]] }}
           axisTop={null}
           axisRight={null}
-          axisBottom={{
-            tickSize: 5,
-            tickPadding: 5,
-            tickRotation: 0,
-            legend: "Average min price",
-            legendPosition: "middle",
-            legendOffset: 32,
-          }}
+          axisBottom={
+            dimensions.width < 380
+              ? null
+              : {
+                  tickSize: 5,
+                  tickPadding: 5,
+                  tickRotation: config.rotate,
+                  legend: "Average min price",
+                  legendPosition: "middle",
+                  legendOffset: config.offset,
+                }
+          }
           axisLeft={{
             tickSize: 5,
             tickPadding: 5,

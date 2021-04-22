@@ -10,6 +10,7 @@ const SideNav = ({
   updateCounty,
   ads,
   showAds,
+  dimensions,
 }) => {
   const { location, setLocation } = useContext(LocationContext);
   const [countyArray, updateCountyArray] = useState(null);
@@ -71,10 +72,14 @@ const SideNav = ({
 
   return (
     <form className="side-nav">
-      <p>
-        Use the map to choose your state and county or choose one from the
-        following dropdown list.
-      </p>
+      {dimensions.width > 700 ? (
+        <p>
+          Use the map to choose your state and county or choose one from the
+          following dropdown list.
+        </p>
+      ) : (
+        <p>Choose your state and county from the following dropdown list.</p>
+      )}
 
       <div className="form-group">
         <select

@@ -2,12 +2,15 @@ import React, { useState, useEffect, useCallback, useContext } from "react";
 import { LocationContext } from "./context/location";
 import { getDrought, getAds } from "./services/get";
 import zipCodes from "./assets/data/zipcodes.json";
+import { debounce } from "./services/utilities";
+import session from "./services/session";
 // Components
 import Loading from "./components/common/loading";
 import SideNav from "./components/forms/side-nav";
 import Ads from "./views/ads";
 import Region from "./views/region";
 import County from "./views/county";
+import Disclaimer from "./components/disclaimer";
 
 // Pull map scripts
 require("./assets/maps/mapdata.min.js");
@@ -24,6 +27,10 @@ function App() {
   const [adData, updateAdData] = useState(null);
   const [droughtData, updateDroughtData] = useState(null);
   const [viewAds, toggleViewAds] = useState(false);
+  const [dimensions, setDimensions] = useState({
+    height: window.innerHeight,
+    width: window.innerWidth,
+  });
 
   // Map globals
   const mapdata = window.simplemaps_countymap_mapdata;
@@ -33,13 +40,25 @@ function App() {
 
   //# Get region data on state change
   const updateApp = useCallback(() => {
-    console.log(location);
     getAdData();
     getDroughtData();
   }, [location]);
 
   useEffect(() => {
     !mapLoaded && map.load();
+
+    const debouncedHandleResize = debounce(function handleResize() {
+      setDimensions({
+        height: window.innerHeight,
+        width: window.innerWidth,
+      });
+    }, 1000);
+
+    window.addEventListener("resize", debouncedHandleResize);
+
+    return (_) => {
+      window.removeEventListener("resize", debouncedHandleResize);
+    };
   }, [mapLoaded, map]);
 
   //* Get Drought for map
@@ -50,7 +69,7 @@ function App() {
       });
       if (success) {
         console.log("Drought:");
-        console.log(success);
+        // console.log(success);
         updateHeatMap(success.data.map);
         updateDroughtData(success.data.map);
       }
@@ -66,7 +85,7 @@ function App() {
         const { data } = await getAds();
         if (data) {
           console.log("Ads:");
-          console.log(data);
+          // console.log(data);
           if (data.entries) {
             updateLocations(data.entries);
           }
@@ -148,7 +167,7 @@ function App() {
     }
   };
 
-  //# Update Ad Locations
+  //? Update Ad Locations
   const updateLocations = (zips) => {
     if (adsLoaded) {
       map.refresh();
@@ -171,7 +190,7 @@ function App() {
             });
         });
         console.log("Locations:");
-        console.log(locations);
+        // console.log(locations);
         mapdata.locations = locations;
         map.refresh();
         updateAdData(locations);
@@ -182,7 +201,7 @@ function App() {
     }
   };
 
-  //# Update heat map
+  //? Update heat map
   const updateHeatMap = (data) => {
     if (heatMapLoaded) {
       map.refresh();
@@ -219,27 +238,34 @@ function App() {
 
   //# Handle state clicks
   map.hooks.zoomable_click_region = (id) => {
-    console.log(id);
     id ? map.region_zoom(id) : map.back();
     setLocation({ region: id });
   };
 
   // //# Handle county clicks
   map.hooks.zoomable_click_state = (id) => {
-    console.log(id);
     id ? map.state_zoom(id) : map.back();
     setLocation({ county: id });
   };
-
-  console.log(mapdata.main_settings);
 
   const { region, county } = location;
   return (
     <div className="container-fluid">
       <section className="map">
-        <Loading trigger={mapLoaded} message="Building map">
-          <div id="map"></div>
-        </Loading>
+        {dimensions.width > 800 ? (
+          <Loading trigger={mapLoaded} message="Building map">
+            <div>
+              <div id="map"></div>
+              <p className="muted">
+                <span className="info">&#9432;</span> The Drought Impact Index
+                identifies the areas of high hay production currently impacted
+                by drought conditions.​
+              </p>
+            </div>
+          </Loading>
+        ) : (
+          <div className="hide" id="map"></div>
+        )}
         <SideNav
           regions={mapinfo.default_regions}
           counties={mapinfo.names}
@@ -247,17 +273,25 @@ function App() {
           updateCounty={map.hooks.zoomable_click_state}
           ads={adData}
           showAds={() => toggleViewAds(!viewAds)}
+          dimensions={dimensions}
         />
       </section>
       {adData && viewAds && <Ads data={adData} />}
-      {county && <County county={county} refreshMap={() => map.refresh()} />}
+      {county && (
+        <County
+          county={county}
+          refreshMap={() => map.refresh()}
+          dimensions={dimensions}
+        />
+      )}
       {region && (
         <Region
           region={region}
-          county={county}
           refreshMap={() => map.refresh()}
+          dimensions={dimensions}
         />
       )}
+      <Disclaimer />
     </div>
   );
 }

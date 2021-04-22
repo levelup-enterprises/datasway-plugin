@@ -1,7 +1,15 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ResponsivePie } from "@nivo/pie";
 
-const HayClass = ({ data }) => {
+const HayClass = ({ data, dimensions }) => {
+  const [showLabels, toggleShowLables] = useState(true);
+  const [margins, setMargins] = useState({
+    top: 20,
+    right: 20,
+    bottom: 60,
+    left: 80,
+  });
+
   if (data) {
     var quality = {};
     var total = data.length;
@@ -18,13 +26,33 @@ const HayClass = ({ data }) => {
     }));
   }
 
+  useEffect(() => {
+    if (dimensions && dimensions.width < 450) {
+      toggleShowLables(false);
+      setMargins({
+        top: 20,
+        right: 20,
+        bottom: 20,
+        left: 20,
+      });
+    } else {
+      toggleShowLables(true);
+      setMargins({
+        top: 20,
+        right: 20,
+        bottom: 60,
+        left: 80,
+      });
+    }
+  }, [dimensions]);
+
   return (
     <div className="chart-container">
       {values && (
         <ResponsivePie
+          key={dimensions && dimensions.width}
           data={values}
-          // margin={{ top: 10, right: 150, bottom: 20, left: 20 }}
-          margin={{ top: 20, right: 20, bottom: 60, left: 80 }}
+          margin={margins}
           sortByValue={true}
           valueFormat={(v) => `${v}%`}
           colors={[
@@ -50,6 +78,7 @@ const HayClass = ({ data }) => {
           sliceLabelsSkipAngle={10}
           sliceLabelsTextColor="#333333"
           enableSliceLabels={false}
+          enableRadialLabels={showLabels}
           radialLabel={(d) => `${d.id} (${d.formattedValue})`}
           defs={[
             {

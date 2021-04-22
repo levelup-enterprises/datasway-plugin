@@ -25,7 +25,7 @@ const CattleFeedBars = ({ bars }) => {
           data={states[0]}
           keys={keys}
           indexBy="state"
-          margin={{ top: 10, right: 10, bottom: 60, left: 70 }}
+          margin={{ top: 30, right: 10, bottom: 10, left: 70 }}
           padding={0.2}
           valueScale={{ type: "linear" }}
           indexScale={{ type: "band", round: true }}
@@ -89,17 +89,18 @@ const CattleFeedBars = ({ bars }) => {
           legends={[
             {
               dataFrom: "keys",
-              anchor: "bottom-right",
+              anchor: "top-left",
               direction: "row",
               justify: false,
-              translateX: 0,
-              translateY: 60,
-              itemsSpacing: 2,
-              itemWidth: 70,
-              itemHeight: 20,
+              translateX: -50,
+              translateY: -30,
+              itemsSpacing: 0,
               itemDirection: "left-to-right",
-              itemOpacity: 0.85,
-              symbolSize: 20,
+              itemWidth: 60,
+              itemHeight: 20,
+              itemOpacity: 0.75,
+              symbolSize: 12,
+              symbolShape: "circle",
               effects: [
                 {
                   on: "hover",

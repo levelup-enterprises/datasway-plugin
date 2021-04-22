@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ResponsivePie } from "@nivo/pie";
 
-const Cropland = ({ data }) => {
+const Cropland = ({ data, dimensions }) => {
+  const [configBottom, setConfigBottom] = useState("20px");
+  const [showLabels, toggleShowLables] = useState(true);
   if (data) {
     var values = [
       {
@@ -16,6 +18,16 @@ const Cropland = ({ data }) => {
       },
     ];
   }
+
+  useEffect(() => {
+    if (dimensions && dimensions.width < 400) {
+      setConfigBottom("4vw");
+      toggleShowLables(false);
+    } else {
+      setConfigBottom("20px");
+      toggleShowLables(true);
+    }
+  }, [dimensions]);
 
   const CenteredMetric = ({ dataWithArc, centerX, centerY }) => {
     return (
@@ -38,7 +50,7 @@ const Cropland = ({ data }) => {
           textAnchor="middle"
           dominantBaseline="central"
           style={{
-            fontSize: "20px",
+            fontSize: configBottom,
             fontWeight: "600",
           }}
         >
@@ -52,10 +64,9 @@ const Cropland = ({ data }) => {
     <div className="chart-container">
       {values && (
         <ResponsivePie
+          key={dimensions && dimensions.width}
           data={values}
           margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-          // startAngle={-115}
-          // endAngle={115}
           sortByValue={true}
           innerRadius={0.8}
           padAngle={0}
@@ -75,6 +86,7 @@ const Cropland = ({ data }) => {
           sliceLabelsSkipAngle={10}
           sliceLabelsTextColor="#333333"
           enableSliceLabels={false}
+          enableRadialLabels={showLabels}
           radialLabel={(d) => `${d.id} (${d.formattedValue})`}
           layers={[
             "slices",
@@ -83,31 +95,6 @@ const Cropland = ({ data }) => {
             "legends",
             CenteredMetric,
           ]}
-          // legends={[
-          //   {
-          //     anchor: "right",
-          //     direction: "column",
-          //     justify: false,
-          //     translateX: 60,
-          //     translateY: 120,
-          //     itemsSpacing: 0,
-          //     itemWidth: 100,
-          //     itemHeight: 18,
-          //     itemTextColor: "#999",
-          //     itemDirection: "left-to-right",
-          //     itemOpacity: 1,
-          //     symbolSize: 15,
-          //     symbolShape: "circle",
-          //     effects: [
-          //       {
-          //         on: "hover",
-          //         style: {
-          //           itemTextColor: "#000",
-          //         },
-          //       },
-          //     ],
-          //   },
-          // ]}
         />
       )}
     </div>

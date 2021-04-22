@@ -2,8 +2,13 @@ import React, { useEffect, useState } from "react";
 import { linearGradientDef } from "@nivo/core";
 import { ResponsiveLine } from "@nivo/line";
 
-const DroughtLine = ({ data }) => {
+const DroughtLine = ({ data, dimensions }) => {
   const [values, updateValues] = useState({});
+  const [config, setConfig] = useState({
+    margin: { top: 50, right: 20, bottom: 50, left: 60 },
+    rotate: 0,
+    offset: 36,
+  });
   // Build data object
   const updateData = (data) => {
     if (data) {
@@ -14,17 +19,34 @@ const DroughtLine = ({ data }) => {
     }
   };
 
+  // Modify based on screen width
+  const modifyChart = (screen) => {
+    screen.width < 750
+      ? setConfig({
+          margin: { top: 20, right: 20, bottom: 60, left: 60 },
+          rotate: -40,
+          offset: 55,
+        })
+      : setConfig({
+          margin: { top: 50, right: 20, bottom: 50, left: 60 },
+          rotate: 0,
+          offset: 36,
+        });
+  };
+
   useEffect(() => {
     updateValues(updateData(data));
-  }, [data]);
+    dimensions && modifyChart(dimensions);
+  }, [data, dimensions]);
 
   //# USE hay-price table
   return (
     <div className="chart-container">
       {values && (
         <ResponsiveLine
+          key={dimensions && dimensions.width}
           data={values}
-          margin={{ top: 50, right: 20, bottom: 50, left: 60 }}
+          margin={config.margin}
           colors={["transparent"]}
           xScale={{
             type: "time",
@@ -44,22 +66,26 @@ const DroughtLine = ({ data }) => {
           curve="natural"
           axisTop={null}
           axisRight={null}
-          axisBottom={{
-            orient: "bottom",
-            format: "%y %b",
-            tickValues: "every month",
-            tickPadding: 5,
-            tickRotation: 0,
-            legend: "Date",
-            legendOffset: 36,
-            legendPosition: "middle",
-          }}
+          axisBottom={
+            dimensions.width < 400
+              ? null
+              : {
+                  orient: "bottom",
+                  format: "%y %b",
+                  tickValues: "every month",
+                  tickPadding: 5,
+                  tickRotation: config.rotate,
+                  legend: "Date",
+                  legendOffset: config.offset,
+                  legendPosition: "middle",
+                }
+          }
           axisLeft={{
             orient: "left",
             tickSize: 5,
             tickPadding: 5,
             tickRotation: 0,
-            legend: "DSIC",
+            legend: "DSCI",
             legendOffset: -40,
             legendPosition: "middle",
           }}
@@ -77,32 +103,6 @@ const DroughtLine = ({ data }) => {
           pointBorderColor={{ from: "serieColor" }}
           pointLabelYOffset={-12}
           useMesh={true}
-          // legends={[
-          //   {
-          //     anchor: "bottom-right",
-          //     direction: "column",
-          //     justify: false,
-          //     translateX: 100,
-          //     translateY: 0,
-          //     itemsSpacing: 0,
-          //     itemDirection: "left-to-right",
-          //     itemWidth: 80,
-          //     itemHeight: 20,
-          //     itemOpacity: 0.75,
-          //     symbolSize: 12,
-          //     symbolShape: "circle",
-          //     symbolBorderColor: "rgba(0, 0, 0, .5)",
-          //     effects: [
-          //       {
-          //         on: "hover",
-          //         style: {
-          //           itemBackground: "rgba(0, 0, 0, .03)",
-          //           itemOpacity: 1,
-          //         },
-          //       },
-          //     ],
-          //   },
-          // ]}
         />
       )}
     </div>

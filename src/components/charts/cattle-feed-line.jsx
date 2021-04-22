@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { ResponsiveLine } from "@nivo/line";
-import _, { values } from "lodash";
+import _ from "lodash";
 
-const CattleFeedLine = ({ data }) => {
+const CattleFeedLine = ({ data, dimensions }) => {
   const [values, updateValues] = useState({});
+  const [config, setConfig] = useState({
+    rotate: 0,
+    offset: 36,
+  });
 
   // Build data object
   const updateData = (data) => {
@@ -20,21 +24,36 @@ const CattleFeedLine = ({ data }) => {
     }
   };
 
+  // Modify based on screen width
+  const modifyChart = (screen) => {
+    screen.width < 750
+      ? setConfig({
+          rotate: -50,
+          offset: 40,
+        })
+      : setConfig({
+          rotate: 0,
+          offset: 36,
+        });
+  };
+
   useEffect(() => {
+    dimensions && modifyChart(dimensions);
     updateValues(updateData(data));
-  }, [data]);
+  }, [data, dimensions]);
 
   //# USE hay-price table
   return (
     <div className="chart-container wide">
       {values && (
         <ResponsiveLine
+          key={dimensions && dimensions.width}
           data={values}
-          margin={{ top: 50, right: 120, bottom: 50, left: 60 }}
+          margin={{ top: 50, right: 30, bottom: 50, left: 60 }}
           colors={data.config ? data.config : null}
           xScale={{
             type: "time",
-            format: "%Y-%m-%d",
+            format: "%m-%d",
             useUTC: false,
             precision: "month",
           }}
@@ -45,21 +64,25 @@ const CattleFeedLine = ({ data }) => {
             stacked: false,
             reverse: false,
           }}
-          xFormat="time:%Y-%m-%d"
+          xFormat="time:%m-%d"
           lineWidth={2}
           curve="natural"
           axisTop={null}
           axisRight={null}
-          axisBottom={{
-            orient: "bottom",
-            format: "%b",
-            tickValues: "every month",
-            tickPadding: 5,
-            tickRotation: 0,
-            legend: "Date",
-            legendOffset: 36,
-            legendPosition: "middle",
-          }}
+          axisBottom={
+            dimensions.width < 350
+              ? null
+              : {
+                  orient: "bottom",
+                  format: "%b",
+                  tickValues: "every month",
+                  tickPadding: 5,
+                  tickRotation: config.rotate,
+                  legend: "Date",
+                  legendOffset: config.offset,
+                  legendPosition: "middle",
+                }
+          }
           axisLeft={{
             orient: "left",
             tickSize: 5,
@@ -78,14 +101,14 @@ const CattleFeedLine = ({ data }) => {
           useMesh={true}
           legends={[
             {
-              anchor: "bottom-right",
-              direction: "column",
+              anchor: "top-left",
+              direction: "row",
               justify: false,
-              translateX: 100,
-              translateY: 0,
+              translateX: -55,
+              translateY: -50,
               itemsSpacing: 0,
               itemDirection: "left-to-right",
-              itemWidth: 80,
+              itemWidth: 60,
               itemHeight: 20,
               itemOpacity: 0.75,
               symbolSize: 12,

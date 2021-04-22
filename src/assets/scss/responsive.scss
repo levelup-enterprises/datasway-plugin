@@ -1,4 +1,8 @@
-@media all and (max-width: 1100px) {
+@media all and (max-width: 1200px) {
+  #map {
+    margin: 0 auto;
+  }
+
   .map {
     .loading-content {
       margin: 0 auto;
@@ -7,6 +11,28 @@
   form.side-nav {
     max-width: 100%;
     margin-top: 2em;
+
+    .form-group:last-of-type {
+      margin-bottom: 2em;
+    }
+
+    select {
+      width: 100%;
+    }
+  }
+
+  .charts {
+    .filler {
+      width: calc(100% - 312px);
+      background: #f8f6f0;
+      border-radius: 10px;
+      padding: 10px 15px;
+      height: 442px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-flow: column;
+    }
   }
 
   .w-75 {
@@ -20,6 +46,15 @@
 @media all and (max-width: 900px) {
   .w-50 {
     max-width: 100%;
+  }
+  .w-25 {
+    max-width: 50%;
+  }
+
+  .charts {
+    .filler {
+      width: 49%;
+    }
   }
 }
 
