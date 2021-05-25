@@ -5,6 +5,10 @@
   font-size: 2em;
 }
 
+//# -----------------------------
+//* Widths
+//# -----------------------------
+
 .w-100 {
   width: 100%;
 }
@@ -28,11 +32,18 @@
   max-width: 25%;
 }
 
+//# -----------------------------
+//* Margins
+//# -----------------------------
 .mt-2 {
   margin-top: 2em;
 }
 .mt-5 {
   margin-top: 5em;
+}
+
+.h-auto {
+  height: auto !important;
 }
 
 .hide {
@@ -58,6 +69,10 @@
     margin: 20px auto;
     padding: 30px 0 20px;
     transition: 0.3s ease-in-out;
+
+    &.offset {
+      margin: -50px auto 50px;
+    }
 
     div {
       box-sizing: border-box;

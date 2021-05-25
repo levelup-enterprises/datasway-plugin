@@ -7,6 +7,7 @@ import Input from "./common/input";
 
 const HayTable = ({
   data,
+  config,
   filters,
   resetFilters,
   resetDate,
@@ -55,7 +56,11 @@ const HayTable = ({
     let row = [];
     Object.values(data).forEach((r, i) => {
       row.push(
-        <div className="row" key={i}>
+        <div
+          className="row"
+          key={i}
+          style={1 & i ? { backgroundColor: config[1] } : {}}
+        >
           {Object.values(r).map((v, i) => {
             return (
               <div className="col" key={i} title={v}>
@@ -149,7 +154,12 @@ const HayTable = ({
       <div className="table">
         {values ? (
           <div className="table-wrapper">
-            <div className="row header">{headers && buildHeaders(headers)}</div>
+            <div
+              className="row header"
+              style={{ backgroundColor: config ? config[0] : "green" }}
+            >
+              {headers && buildHeaders(headers)}
+            </div>
             {rows && rows}
           </div>
         ) : (

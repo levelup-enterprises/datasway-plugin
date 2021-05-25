@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, memo } from "react";
 
-const Loading = (params) => {
+const Loading = memo((params) => {
   const [loading, toggleLoading] = useState(true);
 
   useEffect(() => {
@@ -16,7 +16,7 @@ const Loading = (params) => {
   return (
     <>
       <div className={loading ? "loading-wrapper" : "hide"}>
-        <div className="loading-spinner">
+        <div className={"loading-spinner" + (params.offset ? " offset" : "")}>
           <div></div>
           <div></div>
           <div></div>
@@ -30,6 +30,6 @@ const Loading = (params) => {
       </div>
     </>
   );
-};
+});
 
 export default Loading;

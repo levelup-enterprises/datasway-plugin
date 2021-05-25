@@ -1,5 +1,8 @@
 # Getting Started with Create React App
 
+    "mapdata.min.js": "/wp-content/plugins/datasway/build/mapdata.min.js",
+    "countymap.js": "/wp-content/plugins/datasway/build/countymap.js",
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

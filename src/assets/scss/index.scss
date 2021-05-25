@@ -19,19 +19,41 @@ body {
   transition: 0.3s ease-in-out;
 }
 
+.tab-header {
+  width: 100%;
+  display: inline-flex;
+  margin-bottom: -1px;
+
+  .tab {
+    border: 1px solid #e4e4e4;
+    cursor: pointer;
+
+    h3 {
+      margin: 0;
+      padding: 10px 20px;
+    }
+
+    &.active {
+      background: $section;
+      border-bottom-color: $section;
+    }
+  }
+}
+
 section {
   &.map {
     width: 100%;
     display: flex;
     flex-flow: row wrap;
 
-    .loading-wrapper {
+    > .loading-wrapper {
       width: 700px;
       height: 410px;
-    }
+      margin: 0 auto;
 
-    .loading-spinner {
-      margin-top: 124px;
+      .loading-spinner {
+        margin-top: 124px;
+      }
     }
   }
 
@@ -39,12 +61,30 @@ section {
     display: flex;
     flex-flow: row wrap;
     justify-content: space-between;
+    border: 1px solid #e4e4e4;
+    background: $section;
+    padding: 1%;
+
+    .filler {
+      width: calc(100% - 312px);
+      background: #f8f6f0;
+      border-radius: 10px;
+      padding: 10px 15px;
+      height: 442px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-flow: column;
+    }
   }
 
   &.ads {
     display: flex;
     flex-flow: row wrap;
-    justify-content: space-between;
+    justify-content: flex-start;
+    padding: 10px;
+    margin: 0 auto;
+    max-width: 1060px;
   }
 }
 
@@ -65,6 +105,78 @@ form {
       bottom: 10px;
       padding: 5px 20px;
       left: 5%;
+    }
+
+    .toggle-button {
+      position: relative;
+      width: 100%;
+      height: 38px;
+      padding: 5px;
+      color: grey;
+      left: 0;
+      background: transparent;
+      border-color: transparent;
+      cursor: pointer;
+      max-width: 250px;
+
+      &.disabled {
+        &::before {
+          content: "";
+          position: absolute;
+          top: 4px;
+          left: 16px;
+          width: 48px;
+          height: 27px;
+          background: #c05034;
+          display: inline-block;
+          margin-right: 10px;
+          border: 1px solid #eae8e1;
+          border-radius: 3px;
+        }
+        &::after {
+          content: "";
+          position: absolute;
+          top: 4px;
+          left: 19px;
+          width: 22px;
+          height: 21px;
+          background: #f8f6f0;
+          display: inline-block;
+          margin-top: 3px;
+          box-shadow: 9px 0px 14px -6px #5d5d5d;
+          border-radius: 3px;
+        }
+      }
+
+      &.active {
+        &::before {
+          content: "";
+          position: absolute;
+          top: 4px;
+          left: 16px;
+          width: 48px;
+          height: 27px;
+          background: #83a846;
+          display: inline-block;
+          margin-right: 10px;
+          border: 1px solid #eae8e1;
+          border-radius: 3px;
+        }
+
+        &::after {
+          content: "";
+          position: absolute;
+          top: 4px;
+          left: 39px;
+          background: #f8f6f1;
+          width: 22px;
+          height: 21px;
+          display: inline-block;
+          margin-top: 3px;
+          box-shadow: -9px 0px 14px -6px #5d5d5d;
+          border-radius: 3px;
+        }
+      }
     }
   }
 
@@ -125,6 +237,7 @@ form {
   padding: 1em;
   box-shadow: 0 0.3rem 0.7rem rgb(0 0 0 / 10%);
   margin-bottom: 10px;
+  background-color: #fff;
 
   &.mini {
     display: flex;
@@ -390,10 +503,14 @@ form {
 .card {
   width: 100%;
   max-width: 250px;
-  margin: 10px;
+  margin: 5px;
   border: 1px solid #ddd;
   padding: 0 1em 1em;
   box-shadow: 0 0.3rem 0.7rem rgb(0 0 0 / 10%);
+
+  h2 {
+    margin: 0.5em 0;
+  }
 
   h4 {
     margin: 1em 0;
@@ -412,6 +529,31 @@ form {
 
   h4 {
     margin: 1.5em 0;
+  }
+}
+
+.drought-scale {
+  width: 100%;
+  padding: 5px;
+  display: inline-flex;
+  flex-flow: row nowrap;
+
+  > div {
+    display: block;
+    width: 5%;
+    height: 15px;
+  }
+}
+
+.drought-scale-legend {
+  width: 100%;
+  display: inline-flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+
+  h6 {
+    padding: 5px;
+    margin: 0;
   }
 }
 

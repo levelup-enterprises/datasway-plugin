@@ -112,6 +112,23 @@ export const getHayTransactions = async (values) => {
 };
 
 /**----------------------------------
+ ** Get Hay Transaction for Map
+ * --------------------------------------
+ * @param {string} category
+ * @returns {object}
+ */
+export const getHayTransactionsMap = async (values) => {
+  try {
+    const { data } = await getAPI("hay-transactions-map", values);
+    data && !data.success && !data.error && console.log(data);
+    return data;
+  } catch (e) {
+    console.log(e);
+    return {};
+  }
+};
+
+/**----------------------------------
  ** Get Drought by region
  * --------------------------------------
  * @param {string} category
@@ -134,7 +151,7 @@ export const getDrought = async (values) => {
  * @param {string} category
  * @returns {object}
  */
-export const getAds = async (values) => {
+export const getAds = async () => {
   try {
     const instance = axios.create({
       baseURL: process.env.REACT_APP_ALLHAY_AD_ENDPOINT,
@@ -142,7 +159,7 @@ export const getAds = async (values) => {
     instance.defaults.headers.common = {};
     instance.defaults.headers.common.accept = "application/json";
     const data = await instance.get(
-      "entries?form_id=16&_field_ids=3,4,39,post_id,8,24,42",
+      "listing?_fields=listing_hay_type,listing_state,listing_zipcode,listing_image_url,listing_city,listing_description,listing_hay_variety,link,title,id",
       {
         auth: {
           username: process.env.REACT_APP_ALLHAY_KEY,
@@ -150,7 +167,7 @@ export const getAds = async (values) => {
         },
       }
     );
-    console.log(data);
+    // console.log(data);
     return data;
   } catch (error) {
     console.log(error);

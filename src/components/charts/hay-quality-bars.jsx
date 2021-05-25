@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { ResponsiveBar } from "@nivo/bar";
+import session from "../../services/session";
 import _ from "lodash";
 
-const HayQualityBars = ({ data, dimensions }) => {
+const HayQualityBars = ({ bars, dimensions }) => {
+  const { data } = bars;
   const [quality, setQuality] = useState({});
+  const [colors, setColors] = useState(null);
   const [config, setConfig] = useState({
     margin: 50,
     rotate: 0,
     offset: 32,
   });
+
   // Build data object
   const updateData = (data) => {
     if (!_.isEmpty(data)) {
@@ -25,7 +29,7 @@ const HayQualityBars = ({ data, dimensions }) => {
     screen.width < 750
       ? setConfig({
           margin: 60,
-          rotate: -60,
+          rotate: -50,
           offset: 40,
         })
       : setConfig({
@@ -35,10 +39,22 @@ const HayQualityBars = ({ data, dimensions }) => {
         });
   };
 
+  const configSession = (data) => {
+    if (!session.get("hayQualityBars")) {
+      if (data.config) {
+        session.set("hayQualityBars", data.config);
+        setColors(data.config);
+      } else {
+        setColors(session.get("hayQualityBars"));
+      }
+    }
+  };
+
   useEffect(() => {
-    dimensions && modifyChart(dimensions);
     setQuality(updateData(data));
-  }, [data]);
+    dimensions && modifyChart(dimensions);
+    configSession(bars);
+  }, [data, dimensions, bars]);
 
   //# USE hay-price table
   return (
@@ -49,7 +65,7 @@ const HayQualityBars = ({ data, dimensions }) => {
           data={quality}
           keys={["Min Price"]}
           indexBy="quality"
-          colors={{ scheme: "greens" }}
+          colors={colors ? colors : { scheme: "greens" }}
           colorBy="indexValue"
           margin={{ top: 20, right: 20, bottom: config.margin, left: 120 }}
           padding={0.15}

@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { ResponsiveLine } from "@nivo/line";
+import { Defs } from "@nivo/core";
+import { area, curveNatural } from "d3-shape";
 
 const HayPriceLine = ({ data, dimensions }) => {
   const [values, updateValues] = useState({});
   const [types, setTypes] = useState(null);
   const [currentType, updateCurrentType] = useState({});
-  const [config, setConfig] = useState({
-    margin: 50,
-    rotate: 0,
-    offset: 36,
-  });
+
+  const config = {
+    margin: 60,
+    rotate: -50,
+    offset: 55,
+  };
+
   // Build data object
   const updateData = (data) => {
     if (!data[0]) {
@@ -29,26 +33,11 @@ const HayPriceLine = ({ data, dimensions }) => {
     return Object.keys(types).map((v) => v);
   };
 
-  // Modify based on screen width
-  const modifyChart = (screen) => {
-    screen.width < 750
-      ? setConfig({
-          margin: 60,
-          rotate: -50,
-          offset: 55,
-        })
-      : setConfig({
-          margin: 50,
-          rotate: 0,
-          offset: 36,
-        });
-  };
-
   useEffect(() => {
     const prices = updateData(data);
     const types = getTypes(prices);
 
-    dimensions && modifyChart(dimensions);
+    // dimensions && modifyChart(dimensions);
     setTypes(types);
     updateValues(prices);
     updateCurrentType(prices[types[0]]);
@@ -65,6 +54,51 @@ const HayPriceLine = ({ data, dimensions }) => {
   const handleChange = (e) => {
     e.preventDefault();
     updateCurrentType(values[e.target.value]);
+  };
+
+  const AreaLayer = ({ series, xScale, yScale }) => {
+    // Get top of layer
+    let combined = Object.values(series[1].data).map((value) => ({
+      x: value.data.x,
+      y: value.data.y,
+    }));
+
+    // Combine with bottom of layer
+    combined = Object.values(series[2].data).map((value, i) => ({
+      ...combined[i],
+      z: value.data.y,
+    }));
+
+    const areaGenerator = area()
+      .x((d) => xScale(d.x))
+      .y0((d) => yScale(d.y))
+      .y1((d) => yScale(d.z))
+      .curve(curveNatural);
+
+    return (
+      <>
+        <Defs
+          defs={[
+            {
+              id: "pattern",
+              type: "patternLines",
+              background: "transparent",
+              color: "#3daff7",
+              lineWidth: 1,
+              spacing: 6,
+              rotation: -45,
+            },
+          ]}
+        />
+        <path
+          d={areaGenerator(combined)}
+          fill="url(#pattern)"
+          fillOpacity={0.6}
+          stroke="#3daff7"
+          strokeWidth={2}
+        />
+      </>
+    );
   };
 
   //# USE hay-price table
@@ -100,6 +134,17 @@ const HayPriceLine = ({ data, dimensions }) => {
               stacked: false,
               reverse: false,
             }}
+            layers={[
+              "grid",
+              "markers",
+              "areas",
+              AreaLayer,
+              "lines",
+              "slices",
+              "axes",
+              "points",
+              "legends",
+            ]}
             xFormat="time:%Y-%m-%d"
             lineWidth={2}
             curve="natural"
@@ -140,7 +185,7 @@ const HayPriceLine = ({ data, dimensions }) => {
                 anchor: "top-left",
                 direction: "row",
                 justify: false,
-                translateX: -55,
+                translateX: -240,
                 translateY: -50,
                 itemsSpacing: 50,
                 itemDirection: "left-to-right",

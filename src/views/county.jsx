@@ -22,7 +22,7 @@ const County = ({ county, refreshMap, dimensions }) => {
       getDroughtData(county);
       getHayData(county);
     } else refreshMap();
-  }, [county]);
+  }, [county, currentCounty]);
 
   useEffect(() => {
     updateRegion();
@@ -34,11 +34,12 @@ const County = ({ county, refreshMap, dimensions }) => {
       county: county,
     });
     if (success) {
-      console.log("Drought data:");
-      console.log(success);
+      // console.log("Drought data:");
+      // console.log(success);
       success.data && updateDroughtData(success.data.graph);
       success.data && updateDroughtDSIC(success.data.current);
       updateCurrentCounty(county);
+      toggleLoaded(true);
     }
   };
 
@@ -48,13 +49,10 @@ const County = ({ county, refreshMap, dimensions }) => {
       county: county,
     });
     if (success) {
-      console.log("Hay data:");
-      console.log(success);
-      const { data } = success;
-      console.log(data);
-      updateHayProd(data);
+      // console.log("Hay data:");
+      // console.log(success);
+      updateHayProd(success);
     }
-    toggleLoaded(true);
   };
 
   return (
@@ -65,7 +63,7 @@ const County = ({ county, refreshMap, dimensions }) => {
           <div className="chart-wrapper w-100">
             <div className="chart">
               <h2>Historical Drought</h2>
-              <DroughtLine data={droughtData} dimensions={dimensions} />
+              <DroughtLine drought={droughtData} dimensions={dimensions} />
             </div>
           </div>
         )}
@@ -79,20 +77,37 @@ const County = ({ county, refreshMap, dimensions }) => {
                 levels for the county.
               </p>
               <DroughtDSIC data={droughtDSIC} dimensions={dimensions} />
+
+              <p className="muted">
+                <span className="info">&#9432;</span> The Drought Severity and
+                Coverage Index (DSCI) is a method for converting drought levels
+                from the U.S. Drought Monitor map to a single value for an area.
+                Drought severity is classified into 5 categories and our DSCI
+                graphs are colored accordingly as shown in the table.
+              </p>
+              <p>
+                Source: <b>United States Drought Monitor</b>
+              </p>
             </div>
           </div>
         )}
 
-        {!_.isEmpty(hayProd) && (
-          <div className="chart-wrapper w-50">
+        {!_.isEmpty(hayProd) && hayProd.count > 0 && (
+          <div className="chart-wrapper w-50 h-auto">
             <div className="chart">
               <h2>Cropland</h2>
               <p className="muted">
-                Illustrates the percentage of cropland that is hay in the
-                county. The hay production value is total yearly production of
-                hay in tons.
+                Percent of cropland used for hay production
               </p>
-              <Cropland data={hayProd} dimensions={dimensions} />
+              <Cropland pie={hayProd} dimensions={dimensions} />
+              <p className="muted">
+                <span className="info">&#9432;</span> Hay production value is in
+                ton per year. Data is from 2017 Census of Agriculture performed
+                by National Agricultural Statistics Service.
+              </p>
+              <p>
+                Source: <b>USDA</b>
+              </p>
             </div>
           </div>
         )}

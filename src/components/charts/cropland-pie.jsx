@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { ResponsivePie } from "@nivo/pie";
 
-const Cropland = ({ data, dimensions }) => {
+const Cropland = ({ pie, dimensions }) => {
   const [configBottom, setConfigBottom] = useState("20px");
-  const [showLabels, toggleShowLables] = useState(true);
-  if (data) {
+  const [showLabels, toggleShowLabels] = useState(true);
+  if (pie && pie.data) {
+    const { data } = pie;
     var values = [
       {
         id: "Hay",
@@ -22,14 +23,15 @@ const Cropland = ({ data, dimensions }) => {
   useEffect(() => {
     if (dimensions && dimensions.width < 400) {
       setConfigBottom("4vw");
-      toggleShowLables(false);
+      toggleShowLabels(false);
     } else {
       setConfigBottom("20px");
-      toggleShowLables(true);
+      toggleShowLabels(true);
     }
   }, [dimensions]);
 
-  const CenteredMetric = ({ dataWithArc, centerX, centerY }) => {
+  const CenteredMetric = ({ centerX }) => {
+    const { data } = pie;
     return (
       <>
         <text
@@ -62,36 +64,36 @@ const Cropland = ({ data, dimensions }) => {
 
   return (
     <div className="chart-container">
-      {values && (
+      {pie && values && (
         <ResponsivePie
           key={dimensions && dimensions.width}
           data={values}
-          margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+          margin={{ top: 20, right: 20, bottom: 25, left: 20 }}
           sortByValue={true}
           innerRadius={0.8}
           padAngle={0}
           cornerRadius={0}
           valueFormat={(v) => `${v}%`}
-          colors={["#fcd909", "#377931"]}
+          colors={pie.config ? pie.config : { scheme: "nivo" }}
           borderWidth={1}
           borderColor={{ from: "color", modifiers: [["darker", 0.2]] }}
-          radialLabelsSkipAngle={5}
-          radialLabelsTextXOffset={4}
-          radialLabelsTextColor="#333333"
-          radialLabelsLinkOffset={-13}
-          radialLabelsLinkDiagonalLength={22}
-          radialLabelsLinkHorizontalLength={17}
-          radialLabelsLinkColor={{ from: "color" }}
-          sliceLabelsRadiusOffset={0.7}
-          sliceLabelsSkipAngle={10}
-          sliceLabelsTextColor="#333333"
-          enableSliceLabels={false}
+          arcLabelsSkipAngle={5}
+          arcLabelsTextXOffset={4}
+          arcLabelsTextColor="#333333"
+          arcLabelsLinkOffset={-13}
+          arcLabelsLinkDiagonalLength={22}
+          arcLabelsLinkHorizontalLength={17}
+          arcLabelsLinkColor={{ from: "color" }}
+          arcLabelsRadiusOffset={0.7}
+          arcLinkLabelsSkipAngle={10}
+          arcLinkLabelsTextColor="#333333"
+          enableArcLabels={false}
           enableRadialLabels={showLabels}
-          radialLabel={(d) => `${d.id} (${d.formattedValue})`}
+          arcLinkLabel={(d) => `${d.id} (${d.formattedValue})`}
           layers={[
-            "slices",
-            "sliceLabels",
-            "radialLabels",
+            "arcLinkLabels",
+            "arcs",
+            "arcLabels",
             "legends",
             CenteredMetric,
           ]}

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import session from "../../services/session";
 import { ResponsivePie } from "@nivo/pie";
 
-const HayClass = ({ data, dimensions }) => {
+const HayClass = ({ data, config, dimensions }) => {
   const [showLabels, toggleShowLables] = useState(true);
+  const [colors, setColors] = useState(null);
   const [margins, setMargins] = useState({
     top: 20,
     right: 20,
@@ -26,6 +28,17 @@ const HayClass = ({ data, dimensions }) => {
     }));
   }
 
+  const configSession = (data) => {
+    if (!session.get("hayClassPie")) {
+      if (data) {
+        session.set("hayClassPie", data);
+        setColors(data);
+      } else {
+        setColors(session.get("hayClassPie"));
+      }
+    }
+  };
+
   useEffect(() => {
     if (dimensions && dimensions.width < 450) {
       toggleShowLables(false);
@@ -44,7 +57,8 @@ const HayClass = ({ data, dimensions }) => {
         left: 80,
       });
     }
-  }, [dimensions]);
+    configSession(config);
+  }, [dimensions, config]);
 
   return (
     <div className="chart-container">
@@ -55,16 +69,8 @@ const HayClass = ({ data, dimensions }) => {
           margin={margins}
           sortByValue={true}
           valueFormat={(v) => `${v}%`}
-          colors={[
-            "green",
-            "orange",
-            "#fcd909",
-            "#fe6006e0",
-            "#009805ba",
-            "#e66a00",
-          ]}
+          colors={colors ? colors : { scheme: "nivo" }}
           borderWidth={1}
-          // enableRadialLabels={false}
           borderColor={{ from: "color", modifiers: [["darker", 0.2]] }}
           startAngle={-40}
           radialLabelsSkipAngle={5}

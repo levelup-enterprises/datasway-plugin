@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { linearGradientDef } from "@nivo/core";
 import { ResponsiveLine } from "@nivo/line";
 
-const DroughtLine = ({ data, dimensions }) => {
+const DroughtLine = ({ drought, dimensions }) => {
+  const { data } = drought;
   const [values, updateValues] = useState({});
   const [config, setConfig] = useState({
     margin: { top: 50, right: 20, bottom: 50, left: 60 },
@@ -92,8 +93,12 @@ const DroughtLine = ({ data, dimensions }) => {
           enableArea={true}
           defs={[
             linearGradientDef("gradientA", [
-              { offset: 0, color: "red" },
-              { offset: 200, color: "orange", opacity: 1 },
+              { offset: 0, color: drought.config ? drought.config[0] : null },
+              {
+                offset: 200,
+                color: drought.config ? drought.config[1] : null,
+                opacity: 1,
+              },
             ]),
           ]}
           fill={[{ match: "*", id: "gradientA" }]}

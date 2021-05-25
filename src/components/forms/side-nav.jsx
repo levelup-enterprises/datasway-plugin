@@ -1,20 +1,26 @@
 import React, { useState, useContext, useEffect, useCallback } from "react";
 import { LocationContext } from "../../context/location";
 import { sortValues } from "../../services/utilities";
-import _ from "lodash";
+import Loading from "../common/loading";
 
 const SideNav = ({
   regions,
   counties,
   updateRegion,
   updateCounty,
-  ads,
+  displayButton,
+  toggleDroughtMap,
+  toggleTransactionMap,
   showAds,
+  mapLoaded,
   dimensions,
 }) => {
   const { location, setLocation } = useContext(LocationContext);
   const [countyArray, updateCountyArray] = useState(null);
   const [showAd, toggleShowAd] = useState(false);
+  const [disabled, toggleDisabled] = useState(true);
+  const [droughtToggle, setDroughtToggle] = useState(false);
+  const [transactionToggle, setTransactionToggle] = useState(false);
 
   let states = [];
 
@@ -62,12 +68,27 @@ const SideNav = ({
 
   useEffect(() => {
     location.region && countyDropdown(location.region);
-  }, [location, countyDropdown]);
+    mapLoaded ? toggleDisabled(true) : toggleDisabled(false);
+  }, [location, countyDropdown, mapLoaded]);
 
   const handleShowAds = (e) => {
     e.preventDefault();
     showAds();
     toggleShowAd(!showAd);
+  };
+
+  const handleDroughtToggle = (e) => {
+    e.preventDefault();
+    setDroughtToggle(!droughtToggle);
+    toggleDroughtMap(!droughtToggle);
+    transactionToggle && setTransactionToggle(false);
+  };
+
+  const handleTransactionToggle = (e) => {
+    e.preventDefault();
+    setTransactionToggle(!transactionToggle);
+    toggleTransactionMap(!transactionToggle);
+    droughtToggle && setDroughtToggle(false);
   };
 
   return (
@@ -85,6 +106,7 @@ const SideNav = ({
         <select
           name="region"
           id="region"
+          disabled={disabled}
           value={location.region ? location.region : ""}
           onChange={(e) => handleRegion(e)}
         >
@@ -116,7 +138,29 @@ const SideNav = ({
           </select>
         </div>
       )}
-      {ads && !_.isEmpty(ads) && (
+      {!mapLoaded && <Loading trigger={mapLoaded} offset={true} />}
+      {!location.region && (
+        <>
+          <button
+            className={
+              "toggle-button " + (droughtToggle ? "active" : "disabled")
+            }
+            onClick={(e) => handleDroughtToggle(e)}
+          >
+            <span style={{ marginLeft: 32 }}>Drought Impact</span>
+          </button>
+          <button
+            className={
+              "toggle-button " + (transactionToggle ? "active" : "disabled")
+            }
+            style={{ marginBottom: 20 }}
+            onClick={(e) => handleTransactionToggle(e)}
+          >
+            <span style={{ marginLeft: 43 }}>Market Activities</span>
+          </button>
+        </>
+      )}
+      {displayButton && (
         <button onClick={(e) => handleShowAds(e)}>
           {showAd ? "Hide ads" : "Display ads"}
         </button>

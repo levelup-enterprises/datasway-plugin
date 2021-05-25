@@ -55,7 +55,7 @@ const DroughtDSIC = ({ data, dimensions }) => {
     }
   }, [dimensions]);
 
-  const CenteredMetric = ({ dataWithArc, centerX, centerY }) => {
+  const CenteredMetric = ({ centerX }) => {
     return (
       <>
         <text
@@ -104,13 +104,7 @@ const DroughtDSIC = ({ data, dimensions }) => {
           enableSliceLabels={false}
           enableRadialLabels={false}
           isInteractive={false}
-          layers={[
-            "slices",
-            "sliceLabels",
-            "radialLabels",
-            "legends",
-            CenteredMetric,
-          ]}
+          layers={["arcs", CenteredMetric]}
         />
       )}
     </div>

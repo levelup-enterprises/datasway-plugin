@@ -7,6 +7,8 @@ import {
   getHayTransactions,
 } from "../services/get";
 import Loading from "../components/common/loading";
+import TabHeader from "../components/common/tab-header";
+import TabContainer from "../components/common/tab-container";
 // Charts
 import CattleFeedLine from "../components/charts/cattle-feed-line";
 import CattleFeedBars from "../components/charts/cattle-feed-bars";
@@ -23,6 +25,8 @@ const Region = ({ region, refreshMap, dimensions }) => {
   const [hayTrans, updateHayTrans] = useState({});
   const [loaded, toggleLoaded] = useState(false);
   const [resetDate, setResetDate] = useState(false);
+  const [tab, changeTab] = useState(0);
+
   // Filterable
   const [filterableValues, updateFilterableValues] = useState(null);
   const [valuesSorted, updateValuesSorted] = useState(null);
@@ -53,8 +57,8 @@ const Region = ({ region, refreshMap, dimensions }) => {
       region: region,
     });
     if (success) {
-      console.log("Cattle on feed:");
-      console.log(success);
+      // console.log("Cattle on feed:");
+      // console.log(success);
       success.data && updateCattleData(success.data);
       updateCurrentRegion(region);
     }
@@ -66,8 +70,8 @@ const Region = ({ region, refreshMap, dimensions }) => {
       region: region,
     });
     if (success) {
-      console.log("Hay Price:");
-      console.log(success);
+      // console.log("Hay Price:");
+      // console.log(success);
       success.data && updateHayPrices(success.data);
     }
   };
@@ -77,15 +81,15 @@ const Region = ({ region, refreshMap, dimensions }) => {
     const search = date ? { region: region, date: date } : { region: region };
     const { success, error } = await getHayTransactions(search);
     if (success) {
-      console.log("Hay Transactions:");
-      console.log(success);
+      // console.log("Hay Transactions:");
+      // console.log(success);
       if (success.data) {
         const { data } = success;
         updateHayTrans(data);
         data.table
-          ? updateFilterableValues(data.table)
+          ? updateFilterableValues(data.table.data)
           : updateFilterableValues({});
-        data.table ? buildFilters(data.table) : buildFilters({});
+        data.table ? buildFilters(data.table.data) : buildFilters({});
       }
     }
     error && console.log(error);
@@ -119,7 +123,7 @@ const Region = ({ region, refreshMap, dimensions }) => {
   const handleChange = (value) => {
     if (value !== "Select") {
       const sorted = searchFilter(
-        valuesSorted ? valuesSorted : hayTrans.table,
+        valuesSorted ? valuesSorted : hayTrans.table.data,
         value
       );
       filterBars(sorted);
@@ -133,9 +137,9 @@ const Region = ({ region, refreshMap, dimensions }) => {
   const resetFilters = (e) => {
     e.preventDefault();
     updateValuesSorted(null);
-    buildFilters(hayTrans.table);
+    buildFilters(hayTrans.table.data);
     filterBars(null);
-    updateFilterableValues(hayTrans.table);
+    updateFilterableValues(hayTrans.table.data);
   };
 
   //# Filter Hay Quality Bars
@@ -157,96 +161,139 @@ const Region = ({ region, refreshMap, dimensions }) => {
       updateBarsSorted(bars);
     } else updateBarsSorted(null);
   };
+
   return (
     <Loading trigger={loaded} message="Gathering state data">
       <h1 className="mt-2">Regional information</h1>
+      <TabHeader
+        headers={["Cattle", "Prices", "Transactions"]}
+        updateTab={(e) => changeTab(e)}
+      />
       <section className="charts region">
-        {!_.isEmpty(cattleData) && cattleData.line.count > 0 && (
-          <div className="chart-wrapper w-75">
-            <div className="chart">
-              <h2>Cattle on Feed</h2>
-              <p className="muted">
-                Cattle placed on feed on 1000+ capacity feedlots. Unit is by
-                1000 head.
-              </p>
-              <CattleFeedLine data={cattleData.line} dimensions={dimensions} />
+        <TabContainer active={tab === 0}>
+          {!_.isEmpty(cattleData) && cattleData.line.count > 0 && (
+            <div className="chart-wrapper w-75">
+              <div className="chart">
+                <h2>Cattle on Feed</h2>
+                <p className="muted">
+                  Cattle placed on feed on 1000+ capacity feedlots. Unit is by
+                  1000 head.
+                </p>
+                <CattleFeedLine
+                  data={cattleData.line}
+                  dimensions={dimensions}
+                />
+              </div>
             </div>
-          </div>
-        )}
-        {!_.isEmpty(cattleData) && cattleData.bars.count > 0 && (
-          <div className="chart-wrapper w-25">
-            <div className="chart">
-              <h2>Cattle on Feed</h2>
-              <p className="muted">&nbsp;</p>
-              <CattleFeedBars bars={cattleData.bars} />
+          )}
+          {!_.isEmpty(cattleData) && cattleData.bars.count > 0 && (
+            <div className="chart-wrapper w-25">
+              <div className="chart">
+                <h2>Cattle on Feed</h2>
+                <p className="muted">&nbsp;</p>
+                <CattleFeedBars bars={cattleData.bars} />
+              </div>
             </div>
-          </div>
-        )}
-        {dimensions.width <= 1200 && dimensions.width > 700 && (
-          <div className="filler">
-            <h2>Check out this info</h2>
-            <p>
-              This is a placeholder to display some kind of info to fill in this
-              gap.
-            </p>
-          </div>
-        )}
-        {!_.isEmpty(hayPrices) && (
+          )}
+        </TabContainer>
+        <TabContainer active={tab === 1}>
+          {!_.isEmpty(hayPrices) ? (
+            <div className="chart-wrapper w-100">
+              <div className="chart">
+                <h2>Hay Prices</h2>
+                <p className="muted">
+                  Predicted hay prices in relations with historical hay prices.
+                </p>
+                <HayPriceLine data={hayPrices} dimensions={dimensions} />
+
+                <p className="muted">
+                  <span className="info">&#9432;</span> Price prediction is
+                  based on more than 150 variables. Inputs range from drought
+                  conditions, diesel prices, to cattle on feed. Due to
+                  limitation in historical price data, not all states are
+                  available at this moment. The graph shows the upper and lower
+                  bound of our predicted hay prices.
+                </p>
+                <p>
+                  Source: <b>DataSway Consulting</b>
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="chart-wrapper w-100">
+              <div className="chart">
+                <h2>No Price data available</h2>
+              </div>
+            </div>
+          )}
+        </TabContainer>
+        <TabContainer active={tab === 2}>
           <div className="chart-wrapper w-100">
             <div className="chart">
-              <h2>Hay Prices</h2>
+              <h2>Hay Transactions</h2>
               <p className="muted">
-                Predicted hay prices in relations with historical hay prices.
+                Weekly reported hay transactions. Filter table for specific
+                information to be summarized in the following charts.
               </p>
-              <HayPriceLine data={hayPrices} dimensions={dimensions} />
-            </div>
-          </div>
-        )}
-        <div className="chart-wrapper w-100">
-          <div className="chart">
-            <h2>Hay Transactions</h2>
-            <p className="muted">
-              Weekly reported hay transactions. Filter table for specific
-              information to be summarized in the following charts.
-            </p>
-            <HayTable
-              data={filterableValues}
-              filters={filters}
-              resetDate={resetDate}
-              updateDate={updateDate}
-              handleChange={handleChange}
-              resetFilters={resetFilters}
-              dimensions={dimensions}
-            />
-          </div>
-        </div>
-        {!_.isEmpty(hayTrans) && (
-          <div className="chart-wrapper w-50">
-            <div className="chart">
-              <h2>Hay Quality</h2>
-              <HayQuality data={filterableValues} dimensions={dimensions} />
-            </div>
-          </div>
-        )}
-        {!_.isEmpty(hayTrans) && (
-          <div className="chart-wrapper w-50">
-            <div className="chart">
-              <h2>Hay Class</h2>
-              <HayClass data={filterableValues} dimensions={dimensions} />
-            </div>
-          </div>
-        )}
-        {!_.isEmpty(hayTrans) && (
-          <div className="chart-wrapper w-50">
-            <div className="chart">
-              <h2>Hay Quality</h2>
-              <HayQualityBars
-                data={barsSorted ? barsSorted : hayTrans.bars}
+              <HayTable
+                data={filterableValues}
+                config={hayTrans.table && hayTrans.table.config}
+                filters={filters}
+                resetDate={resetDate}
+                updateDate={updateDate}
+                handleChange={handleChange}
+                resetFilters={resetFilters}
                 dimensions={dimensions}
               />
+
+              <p className="muted">
+                <span className="info">&#9432;</span> The table displays hay
+                transactions collected by the USDA. Most recent records are
+                displayed by default. Use filtering features to narrow data by
+                interest. All graphs are summary of all records displayed in the
+                table.
+              </p>
+              <p>
+                Source: <b>USDA</b>
+              </p>
             </div>
           </div>
-        )}
+          {!_.isEmpty(hayTrans) && (
+            <div className="chart-wrapper w-50">
+              <div className="chart">
+                <h2>Hay Quality</h2>
+                <HayQuality
+                  data={filterableValues}
+                  config={hayTrans.config && hayTrans.config.quality}
+                  dimensions={dimensions}
+                />
+              </div>
+            </div>
+          )}
+          {!_.isEmpty(hayTrans) && (
+            <div className="chart-wrapper w-50">
+              <div className="chart">
+                <h2>Hay Class</h2>
+                <HayClass
+                  data={filterableValues}
+                  config={hayTrans.config && hayTrans.config.class}
+                  dimensions={dimensions}
+                />
+              </div>
+            </div>
+          )}
+          {!_.isEmpty(hayTrans) && (
+            <div className="chart-wrapper w-50">
+              <div className="chart">
+                <h2>Hay Quality</h2>
+                <HayQualityBars
+                  bars={barsSorted ? { data: barsSorted } : hayTrans.bars}
+                  dimensions={dimensions}
+                />
+              </div>
+            </div>
+          )}
+        </TabContainer>
       </section>
     </Loading>
   );
