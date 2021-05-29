@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { searchFilter } from "../services/utilities";
+import { searchFilter, clg } from "../services/utilities";
 import _ from "lodash";
 import {
   getCattleFeed,
@@ -57,8 +57,8 @@ const Region = ({ region, refreshMap, dimensions }) => {
       region: region,
     });
     if (success) {
-      // console.log("Cattle on feed:");
-      // console.log(success);
+      clg("Cattle on feed:");
+      clg(success);
       success.data && updateCattleData(success.data);
       updateCurrentRegion(region);
     }
@@ -70,8 +70,8 @@ const Region = ({ region, refreshMap, dimensions }) => {
       region: region,
     });
     if (success) {
-      // console.log("Hay Price:");
-      // console.log(success);
+      clg("Hay Price:");
+      clg(success);
       success.data && updateHayPrices(success.data);
     }
   };
@@ -81,8 +81,8 @@ const Region = ({ region, refreshMap, dimensions }) => {
     const search = date ? { region: region, date: date } : { region: region };
     const { success, error } = await getHayTransactions(search);
     if (success) {
-      // console.log("Hay Transactions:");
-      // console.log(success);
+      clg("Hay Transactions:");
+      clg(success);
       if (success.data) {
         const { data } = success;
         updateHayTrans(data);

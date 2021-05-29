@@ -7,6 +7,11 @@
     .loading-content {
       margin: 0 auto;
     }
+    &.hide {
+      .loading-wrapper {
+        display: none;
+      }
+    }
   }
   form.side-nav {
     max-width: 100%;

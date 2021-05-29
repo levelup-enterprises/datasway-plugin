@@ -93,7 +93,7 @@ export async function getJwt(clear = null) {
       const { data } = await http.post(
         "post/authenticate.php",
         postify({
-          password: "password",
+          password: process.env.REACT_APP_DATASWAY_SECRET,
         })
       );
       session.set(tokenKey, data.success.token);

@@ -1,12 +1,9 @@
 window.simplemaps_countymap_mapdata = {
   main_settings: {
-    //General settings
-    width: "700", //'700' or 'responsive'
+    width: "750",
     background_color: "#FFFFFF",
     background_transparent: "no",
     popups: "detect",
-
-    //State defaults
     state_description: "State description",
     state_color: "#bdbdbd",
     state_hover_color: "#3B729F",
@@ -15,8 +12,6 @@ window.simplemaps_countymap_mapdata = {
     border_color: "#FFFFFF",
     all_states_inactive: "no",
     all_states_zoomable: "yes",
-
-    //Location defaults
     location_description: "Location description",
     location_color: "green",
     location_opacity: 0.8,
@@ -29,8 +24,6 @@ window.simplemaps_countymap_mapdata = {
     location_hover_border: 2.5,
     all_locations_inactive: "no",
     all_locations_hidden: "no",
-
-    //Label defaults
     label_color: "#d5ddec",
     label_hover_color: "#d5ddec",
     label_size: 22,
@@ -51,16 +44,12 @@ window.simplemaps_countymap_mapdata = {
     zoom_out_incrementally: "yes",
     zoom_percentage: 0.99,
     zoom_time: 0.3,
-
-    //Popup settings
     popup_color: "white",
     popup_opacity: 0.9,
     popup_shadow: 1,
     popup_corners: 5,
     popup_font: "12px/1.5 Verdana, Arial, Helvetica, sans-serif",
     popup_nocss: "no",
-
-    //Advanced settings
     div: "map",
     auto_load: "no",
     rotate: "0",
@@ -70,15 +59,12 @@ window.simplemaps_countymap_mapdata = {
     fade_time: 0.3,
     link_text: "View Website",
     location_image_source: "frog.png",
-
-    //Zoom settings
     zoom: "yes",
     line_color: "#ffffff",
     line_size: "1.5",
     state_image_url: "",
     state_image_position: "",
-    location_image_url:
-      process.env.REACT_APP_API_URL + "public/images/location-pin-blue.png",
+    location_image_url: "",
   },
   state_specific: {
     10001: {

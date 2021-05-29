@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useContext } from "react";
 import { LocationContext } from "./context/location";
 import { getDrought, getAds, getHayTransactionsMap } from "./services/get";
 import zipCodes from "./assets/data/zipcodes.json";
-import { debounce } from "./services/utilities";
+import { debounce, clg } from "./services/utilities";
 // Components
 import Loading from "./components/common/loading";
 import SideNav from "./components/forms/side-nav";
@@ -38,7 +38,9 @@ function App() {
 
   //# Get region data on state change
   const updateApp = useCallback(() => {
-    !adData && getAdData();
+    !adData ? getAdData() : updateMapLoaded(true);
+    getDroughtData();
+    getStateTransactions();
   }, [adData]);
 
   useEffect(() => {
@@ -68,9 +70,9 @@ function App() {
         map: true,
       });
       if (success) {
-        // console.log("Drought:");
+        clg("Drought:");
         // console.log(success);
-        updateHeatMap(success.data.map);
+        // updateHeatMap(success.data.map);
         updateDroughtData(success.data.map);
       }
     } else {
@@ -84,7 +86,7 @@ function App() {
       if (!adData) {
         const { data } = await getAds();
         if (data) {
-          // console.log("Ads:");
+          clg("Ads:");
           // console.log(data);
           data && updateLocations(data);
         }
@@ -104,10 +106,10 @@ function App() {
     if (!transactionData) {
       const { success } = await getHayTransactionsMap();
       if (success) {
-        // console.log("Map Transactions:");
+        clg("Map Transactions:");
         // console.log(success);
         updateTransactionData(success.data);
-        updateTransactionsMap(success.data.states, success.data.max);
+        // updateTransactionsMap(success.data.states, success.data.max);
       }
     } else {
       console.log("Map refresh");
@@ -372,6 +374,7 @@ function App() {
 
   //# Map loaded
   map.hooks.complete = () => {
+    clg("Map loaded");
     updateApp();
   };
 
@@ -384,12 +387,14 @@ function App() {
 
   //# Handle state clicks
   map.hooks.zoomable_click_region = (id) => {
+    clg("State: " + id);
     id ? map.region_zoom(id) : map.back();
     setLocation({ region: id });
   };
 
   // //# Handle county clicks
   map.hooks.zoomable_click_state = (id) => {
+    clg("County: " + id);
     id ? map.state_zoom(id) : map.back();
     setLocation({ county: id });
   };
@@ -397,91 +402,87 @@ function App() {
   const { region, county } = location;
   return (
     <div className="container-fluid">
-      <section className="map">
-        {dimensions.width > 800 ? (
-          <Loading trigger={mapLoaded} message="Building map">
-            <div>
-              <div id="map"></div>
-              {showDroughtText && heatMapLoaded && (
-                <>
-                  <div className="drought-scale">
-                    <div style={{ backgroundColor: "beige" }}></div>
-                    <div style={{ backgroundColor: "#bfbf67" }}></div>
-                    <div style={{ backgroundColor: "#adad4b" }}></div>
-                    <div style={{ backgroundColor: "#b1b107" }}></div>
-                    <div style={{ backgroundColor: "#989800" }}></div>
-                    <div style={{ backgroundColor: "gold" }}></div>
-                    <div style={{ backgroundColor: "#d2b209" }}></div>
-                    <div style={{ backgroundColor: "#ad9207" }}></div>
-                    <div style={{ backgroundColor: "#a28800" }}></div>
-                    <div style={{ backgroundColor: "#8a7400" }}></div>
-                    <div style={{ backgroundColor: "#f7b570" }}></div>
-                    <div style={{ backgroundColor: "#f5a756" }}></div>
-                    <div style={{ backgroundColor: "#f59838" }}></div>
-                    <div style={{ backgroundColor: "#f58a1d" }}></div>
-                    <div style={{ backgroundColor: "#f98005" }}></div>
-                    <div style={{ backgroundColor: "#ef9898" }}></div>
-                    <div style={{ backgroundColor: "#f17777" }}></div>
-                    <div style={{ backgroundColor: "#f15757" }}></div>
-                    <div style={{ backgroundColor: "#f33a3a" }}></div>
-                    <div style={{ backgroundColor: "red" }}></div>
-                    <div style={{ backgroundColor: "#d01f1f" }}></div>
-                    <div style={{ backgroundColor: "#b31313" }}></div>
-                    <div style={{ backgroundColor: "#920a0a" }}></div>
-                    <div style={{ backgroundColor: "#710202" }}></div>
-                    <div style={{ backgroundColor: "#4e0000" }}></div>
-                  </div>
-                  <div className="drought-scale-legend">
-                    <h6>Low drought</h6>
-                    <h6>Extreme drought</h6>
-                  </div>
-                  <p className="muted">
-                    <span className="info">&#9432;</span> The Drought Impact
-                    Index identifies the areas of high hay production currently
-                    impacted by drought conditions.​
-                  </p>
-                </>
-              )}
-              {showTransactionText && heatMapLoaded && (
-                <>
-                  <div className="drought-scale">
-                    <div style={{ backgroundColor: "#85e7f2" }}></div>
-                    <div style={{ backgroundColor: "#7fe0f2" }}></div>
-                    <div style={{ backgroundColor: "#7dddf4" }}></div>
-                    <div style={{ backgroundColor: "#76d1f6" }}></div>
-                    <div style={{ backgroundColor: "#72c6f9" }}></div>
-                    <div style={{ backgroundColor: "#71c1f9" }}></div>
-                    <div style={{ backgroundColor: "#6dbafa" }}></div>
-                    <div style={{ backgroundColor: "#6ab3fc" }}></div>
-                    <div style={{ backgroundColor: "#69affd" }}></div>
-                    <div style={{ backgroundColor: "#6baefd" }}></div>
-                    <div style={{ backgroundColor: "#02baf6" }}></div>
-                    <div style={{ backgroundColor: "#01b1f3" }}></div>
-                    <div style={{ backgroundColor: "#07a7f4" }}></div>
-                    <div style={{ backgroundColor: "#0b99f3" }}></div>
-                    <div style={{ backgroundColor: "#0894f1" }}></div>
-                    <div style={{ backgroundColor: "#028ef0" }}></div>
-                    <div style={{ backgroundColor: "#0786ef" }}></div>
-                    <div style={{ backgroundColor: "#0677ed" }}></div>
-                    <div style={{ backgroundColor: "#086feb" }}></div>
-                    <div style={{ backgroundColor: "#0868ea" }}></div>
-                  </div>
-                  <div className="drought-scale-legend">
-                    <h6>Cool market</h6>
-                    <h6>Hot market</h6>
-                  </div>
-                  <p className="muted">
-                    <span className="info">&#9432;</span> Index is the count of
-                    all hay transactions in each state. Color range is between
-                    lowest to highest​ count for the month.
-                  </p>
-                </>
-              )}
-            </div>
-          </Loading>
-        ) : (
-          <div className="hide" id="map"></div>
-        )}
+      <section className={"map" + (dimensions.width <= 800 ? " hide" : "")}>
+        <Loading trigger={mapLoaded} message="Building map">
+          <div>
+            <div id="map"></div>
+            {showDroughtText && heatMapLoaded && (
+              <>
+                <div className="drought-scale">
+                  <div style={{ backgroundColor: "beige" }}></div>
+                  <div style={{ backgroundColor: "#bfbf67" }}></div>
+                  <div style={{ backgroundColor: "#adad4b" }}></div>
+                  <div style={{ backgroundColor: "#b1b107" }}></div>
+                  <div style={{ backgroundColor: "#989800" }}></div>
+                  <div style={{ backgroundColor: "gold" }}></div>
+                  <div style={{ backgroundColor: "#d2b209" }}></div>
+                  <div style={{ backgroundColor: "#ad9207" }}></div>
+                  <div style={{ backgroundColor: "#a28800" }}></div>
+                  <div style={{ backgroundColor: "#8a7400" }}></div>
+                  <div style={{ backgroundColor: "#f7b570" }}></div>
+                  <div style={{ backgroundColor: "#f5a756" }}></div>
+                  <div style={{ backgroundColor: "#f59838" }}></div>
+                  <div style={{ backgroundColor: "#f58a1d" }}></div>
+                  <div style={{ backgroundColor: "#f98005" }}></div>
+                  <div style={{ backgroundColor: "#ef9898" }}></div>
+                  <div style={{ backgroundColor: "#f17777" }}></div>
+                  <div style={{ backgroundColor: "#f15757" }}></div>
+                  <div style={{ backgroundColor: "#f33a3a" }}></div>
+                  <div style={{ backgroundColor: "red" }}></div>
+                  <div style={{ backgroundColor: "#d01f1f" }}></div>
+                  <div style={{ backgroundColor: "#b31313" }}></div>
+                  <div style={{ backgroundColor: "#920a0a" }}></div>
+                  <div style={{ backgroundColor: "#710202" }}></div>
+                  <div style={{ backgroundColor: "#4e0000" }}></div>
+                </div>
+                <div className="drought-scale-legend">
+                  <h6>Low Impact</h6>
+                  <h6>High Impact</h6>
+                </div>
+                <p className="muted">
+                  <span className="info">&#9432;</span> The Drought Impact Index
+                  identifies the areas of high hay production currently impacted
+                  by drought conditions.​
+                </p>
+              </>
+            )}
+            {showTransactionText && heatMapLoaded && (
+              <>
+                <div className="drought-scale">
+                  <div style={{ backgroundColor: "#85e7f2" }}></div>
+                  <div style={{ backgroundColor: "#7fe0f2" }}></div>
+                  <div style={{ backgroundColor: "#7dddf4" }}></div>
+                  <div style={{ backgroundColor: "#76d1f6" }}></div>
+                  <div style={{ backgroundColor: "#72c6f9" }}></div>
+                  <div style={{ backgroundColor: "#71c1f9" }}></div>
+                  <div style={{ backgroundColor: "#6dbafa" }}></div>
+                  <div style={{ backgroundColor: "#6ab3fc" }}></div>
+                  <div style={{ backgroundColor: "#69affd" }}></div>
+                  <div style={{ backgroundColor: "#6baefd" }}></div>
+                  <div style={{ backgroundColor: "#02baf6" }}></div>
+                  <div style={{ backgroundColor: "#01b1f3" }}></div>
+                  <div style={{ backgroundColor: "#07a7f4" }}></div>
+                  <div style={{ backgroundColor: "#0b99f3" }}></div>
+                  <div style={{ backgroundColor: "#0894f1" }}></div>
+                  <div style={{ backgroundColor: "#028ef0" }}></div>
+                  <div style={{ backgroundColor: "#0786ef" }}></div>
+                  <div style={{ backgroundColor: "#0677ed" }}></div>
+                  <div style={{ backgroundColor: "#086feb" }}></div>
+                  <div style={{ backgroundColor: "#0868ea" }}></div>
+                </div>
+                <div className="drought-scale-legend">
+                  <h6>Cool market</h6>
+                  <h6>Hot market</h6>
+                </div>
+                <p className="muted">
+                  <span className="info">&#9432;</span> Index is the count of
+                  all hay transactions in each state. Color range is between
+                  lowest to highest​ count for the month.
+                </p>
+              </>
+            )}
+          </div>
+        </Loading>
         <SideNav
           regions={mapinfo.default_regions}
           counties={mapinfo.names}

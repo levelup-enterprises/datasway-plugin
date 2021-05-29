@@ -139,27 +139,25 @@ const SideNav = ({
         </div>
       )}
       {!mapLoaded && <Loading trigger={mapLoaded} offset={true} />}
-      {!location.region && (
-        <>
-          <button
-            className={
-              "toggle-button " + (droughtToggle ? "active" : "disabled")
-            }
-            onClick={(e) => handleDroughtToggle(e)}
-          >
-            <span style={{ marginLeft: 32 }}>Drought Impact</span>
-          </button>
-          <button
-            className={
-              "toggle-button " + (transactionToggle ? "active" : "disabled")
-            }
-            style={{ marginBottom: 20 }}
-            onClick={(e) => handleTransactionToggle(e)}
-          >
-            <span style={{ marginLeft: 43 }}>Market Activities</span>
-          </button>
-        </>
-      )}
+      {/* {!location.region && ( */}
+      <>
+        <button
+          className={"toggle-button " + (droughtToggle ? "active" : "disabled")}
+          onClick={(e) => handleDroughtToggle(e)}
+        >
+          <span style={{ marginLeft: 32 }}>Drought Impact</span>
+        </button>
+        <button
+          className={
+            "toggle-button " + (transactionToggle ? "active" : "disabled")
+          }
+          style={{ marginBottom: 20 }}
+          onClick={(e) => handleTransactionToggle(e)}
+        >
+          <span style={{ marginLeft: 43 }}>Market Activities</span>
+        </button>
+      </>
+      {/* )} */}
       {displayButton && (
         <button onClick={(e) => handleShowAds(e)}>
           {showAd ? "Hide ads" : "Display ads"}

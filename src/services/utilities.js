@@ -281,3 +281,13 @@ export function debounce(fn, ms) {
     }, ms);
   };
 }
+
+/** ------------------------------------
+ ** Prevent too many resize calls
+ * ------------------------------------
+ * @param {string} message
+ * @return console log
+ */
+export function clg(message) {
+  process.env.NODE_ENV !== "production" && console.log(message);
+}
